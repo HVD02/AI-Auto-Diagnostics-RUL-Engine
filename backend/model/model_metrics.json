@@ -1,0 +1,264 @@
+{
+  "diagnosis": {
+    "best_model": "XGBoost",
+    "model_comparison": {
+      "LogisticRegression": {
+        "val_accuracy": 0.5882142857142857,
+        "val_precision_macro": 0.5906964051300811,
+        "val_recall_macro": 0.585843253968254,
+        "val_f1_macro": 0.5875009158029534,
+        "val_roc_auc_ovr": 0.8711165521090488,
+        "cv_f1_macro_mean": 0.5854514120471561,
+        "cv_f1_macro_std": 0.006400434077756814,
+        "trained_on_subsample": false
+      },
+      "RandomForest": {
+        "val_accuracy": 0.7476190476190476,
+        "val_precision_macro": 0.755882477635986,
+        "val_recall_macro": 0.7558730158730159,
+        "val_f1_macro": 0.755856065740427,
+        "val_roc_auc_ovr": 0.9173072799255204,
+        "cv_f1_macro_mean": 0.7550329093898782,
+        "cv_f1_macro_std": 0.003236539157982536,
+        "trained_on_subsample": false
+      },
+      "SVM_RBF": {
+        "val_accuracy": 0.741547619047619,
+        "val_precision_macro": 0.7440509778527794,
+        "val_recall_macro": 0.7475651154401154,
+        "val_f1_macro": 0.743333331223672,
+        "val_roc_auc_ovr": 0.917278150499642,
+        "cv_f1_macro_mean": 0.741232338397217,
+        "cv_f1_macro_std": 0.016272892488834213,
+        "trained_on_subsample": true
+      },
+      "XGBoost": {
+        "val_accuracy": 0.7503571428571428,
+        "val_precision_macro": 0.75850452118488,
+        "val_recall_macro": 0.7585386904761905,
+        "val_f1_macro": 0.7585017922911975,
+        "val_roc_auc_ovr": 0.9189154213446895,
+        "cv_f1_macro_mean": 0.7571403328330291,
+        "cv_f1_macro_std": 0.004139372270548412,
+        "trained_on_subsample": false
+      }
+    },
+    "test_metrics": {
+      "test_accuracy": 0.7504761904761905,
+      "test_precision_macro": 0.7589980643459113,
+      "test_recall_macro": 0.7590079365079365,
+      "test_f1_macro": 0.7589630653248796,
+      "test_roc_auc_ovr": 0.9166899248290102,
+      "confusion_matrix": [
+        [
+          2400,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1650,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1175,
+          1075
+        ],
+        [
+          0,
+          0,
+          1021,
+          1079
+        ]
+      ],
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 2400.0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 1650.0
+        },
+        "2": {
+          "precision": 0.535063752276867,
+          "recall": 0.5222222222222223,
+          "f1-score": 0.5285650022492128,
+          "support": 2250.0
+        },
+        "3": {
+          "precision": 0.5009285051067781,
+          "recall": 0.5138095238095238,
+          "f1-score": 0.5072872590503056,
+          "support": 2100.0
+        },
+        "accuracy": 0.7504761904761905,
+        "macro avg": {
+          "precision": 0.7589980643459113,
+          "recall": 0.7590079365079365,
+          "f1-score": 0.7589630653248796,
+          "support": 8400.0
+        },
+        "weighted avg": {
+          "precision": 0.7506956313508554,
+          "recall": 0.7504761904761905,
+          "f1-score": 0.7505445832221869,
+          "support": 8400.0
+        }
+      }
+    },
+    "n_train": 39199,
+    "n_val": 8400,
+    "n_test": 8400,
+    "n_features": 14,
+    "features": [
+      "MAP",
+      "TPS",
+      "Force",
+      "Power",
+      "RPM",
+      "Consumption L/H",
+      "Consumption L/100KM",
+      "Speed",
+      "CO",
+      "HC",
+      "CO2",
+      "O2",
+      "Lambda",
+      "AFR"
+    ],
+    "classes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "dataset": "EngineFaultDB_Final.csv"
+  },
+  "rul": {
+    "best_model": "RandomForestRegressor",
+    "model_comparison": {
+      "RandomForestRegressor": {
+        "val_mae": 12.841529380837844,
+        "val_rmse": 18.719516746263892,
+        "val_r2": 0.7997603604790026
+      },
+      "GradientBoosting": {
+        "val_mae": 12.980314007339334,
+        "val_rmse": 18.94041804863691,
+        "val_r2": 0.7950065854083048
+      },
+      "XGBoostRegressor": {
+        "val_mae": 13.000419142101967,
+        "val_rmse": 19.04903737470629,
+        "val_r2": 0.7926486730575562
+      }
+    },
+    "test_metrics": {
+      "test_mae": 12.404932760450428,
+      "test_rmse": 17.39516400404066,
+      "test_r2": 0.8115711721375071,
+      "n_test_units": 100
+    },
+    "rul_cap": 125,
+    "n_train_units": 85,
+    "n_val_units": 15,
+    "features": [
+      "op1",
+      "op2",
+      "op3",
+      "sensor_2",
+      "sensor_3",
+      "sensor_4",
+      "sensor_6",
+      "sensor_7",
+      "sensor_8",
+      "sensor_9",
+      "sensor_11",
+      "sensor_12",
+      "sensor_13",
+      "sensor_14",
+      "sensor_15",
+      "sensor_17",
+      "sensor_20",
+      "sensor_21"
+    ],
+    "dataset": "NASA C-MAPSS FD001 (turbofan jet engine, NOT automotive)",
+    "split_strategy": "unit-level (engine-level) split, no row leakage across a trajectory"
+  },
+  "anomaly": {
+    "best_model": "LocalOutlierFactor",
+    "model_comparison": {
+      "IsolationForest": {
+        "f1": 0.8988386735693298,
+        "precision": 0.8417190775681341,
+        "recall": 0.9642749924947464
+      },
+      "OneClassSVM": {
+        "f1": 0.910377358490566,
+        "precision": 0.8462728914108847,
+        "recall": 0.9849894926448514
+      },
+      "LocalOutlierFactor": {
+        "f1": 0.9147994467496542,
+        "precision": 0.848166196460631,
+        "recall": 0.9927949564695286
+      }
+    },
+    "n_samples": 4200,
+    "n_anomaly": 3331,
+    "n_normal": 869,
+    "features": [
+      "coolant_temp_c",
+      "oil_pressure_kpa",
+      "rpm",
+      "engine_load_pct",
+      "intake_temp_c",
+      "fuel_rate_lph",
+      "throttle_pos_pct",
+      "vibration_g",
+      "battery_voltage_v",
+      "speed_kph",
+      "coolant_temp_c_roll_mean",
+      "coolant_temp_c_roll_std",
+      "coolant_temp_c_rate",
+      "oil_pressure_kpa_roll_mean",
+      "oil_pressure_kpa_roll_std",
+      "oil_pressure_kpa_rate",
+      "rpm_roll_mean",
+      "rpm_roll_std",
+      "rpm_rate",
+      "engine_load_pct_roll_mean",
+      "engine_load_pct_roll_std",
+      "engine_load_pct_rate",
+      "intake_temp_c_roll_mean",
+      "intake_temp_c_roll_std",
+      "intake_temp_c_rate",
+      "fuel_rate_lph_roll_mean",
+      "fuel_rate_lph_roll_std",
+      "fuel_rate_lph_rate",
+      "throttle_pos_pct_roll_mean",
+      "throttle_pos_pct_roll_std",
+      "throttle_pos_pct_rate",
+      "vibration_g_roll_mean",
+      "vibration_g_roll_std",
+      "vibration_g_rate",
+      "battery_voltage_v_roll_mean",
+      "battery_voltage_v_roll_std",
+      "battery_voltage_v_rate",
+      "speed_kph_roll_mean",
+      "speed_kph_roll_std",
+      "speed_kph_rate"
+    ],
+    "dataset": "SYNTHETIC demo_vehicle_telemetry.csv (EngineAD real data not included in provided materials; see docs/dataset_sources.md)",
+    "note": "Trained one-class on the healthy scenario per EngineAD paper protocol."
+  }
+}

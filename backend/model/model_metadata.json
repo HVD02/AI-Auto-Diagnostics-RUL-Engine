@@ -1,0 +1,33 @@
+{
+  "project": "AI Auto-Diagnostics & RUL Engine",
+  "model_version": "v1.0.0",
+  "training_date": "2026-08-19",
+  "models": {
+    "diagnosis": {
+      "algorithm": "XGBoost",
+      "dataset": "EngineFaultDB_Final.csv",
+      "n_features": 14,
+      "classes": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "preprocessing": "StandardScaler (fit on train split only)",
+      "split_strategy": "Stratified 70/15/15 train/val/test"
+    },
+    "rul": {
+      "algorithm": "RandomForestRegressor",
+      "dataset": "NASA C-MAPSS FD001 (turbofan jet engine, NOT automotive)",
+      "rul_cap": 125,
+      "preprocessing": "StandardScaler (fit on train split only), zero-variance sensors dropped",
+      "split_strategy": "unit-level (engine-level) split, no row leakage across a trajectory"
+    },
+    "anomaly": {
+      "algorithm": "LocalOutlierFactor",
+      "dataset": "SYNTHETIC demo_vehicle_telemetry.csv (EngineAD real data not included in provided materials; see docs/dataset_sources.md)",
+      "preprocessing": "StandardScaler (fit on healthy-scenario training subset), rolling mean/std/rate feature engineering",
+      "protocol": "One-class: trained on healthy segment only, evaluated on full labeled set"
+    }
+  }
+}
