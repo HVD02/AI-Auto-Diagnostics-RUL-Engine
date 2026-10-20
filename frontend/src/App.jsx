@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { Routes, Route, NavLink, Link, Outlet, useLocation } from "react-router-dom";
 import {
   Gauge as GaugeIcon, HeartPulse, Stethoscope, Radar, LineChart, TrendingDown,
   Brain, SlidersHorizontal, Wrench, Boxes, History as HistoryIcon,
@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { VehicleProvider, useVehicle } from "./VehicleContext.jsx";
 
+import Welcome from "./pages/Welcome.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import VehicleHealth from "./pages/VehicleHealth.jsx";
 import Diagnostics from "./pages/Diagnostics.jsx";
@@ -25,7 +26,7 @@ import About from "./pages/About.jsx";
 
 const NAV = [
   { group: "Overview", items: [
-    { to: "/", label: "Dashboard", icon: GaugeIcon },
+    { to: "/dashboard", label: "Dashboard", icon: GaugeIcon },
     { to: "/health", label: "Vehicle Health", icon: HeartPulse },
     { to: "/twin", label: "Digital Twin", icon: Boxes },
   ]},
@@ -52,13 +53,19 @@ const NAV = [
 function Sidebar() {
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
+      <Link
+        to="/"
+        className="sidebar-brand"
+        style={{ display: "block", textDecoration: "none", color: "inherit" }}
+        title="Back to welcome screen"
+        aria-label="AI Auto-Diagnostics, RUL Engine. Return to the welcome screen"
+      >
         <div className="logo-row">
           <span className="logo-dot" />
           <h1>AI AUTO-DIAGNOSTICS</h1>
         </div>
-        <p>RUL ENGINE · v1.0.0</p>
-      </div>
+        <p>RUL ENGINE · v2.0.0</p>
+      </Link>
       {NAV.map(g => (
         <div className="nav-group" key={g.group}>
           <div className="nav-group-label">{g.group}</div>
@@ -80,7 +87,7 @@ function Sidebar() {
 }
 
 const PAGE_TITLES = {
-  "/": "Dashboard", "/health": "Vehicle Health", "/twin": "Vehicle Digital Twin",
+  "/dashboard": "Dashboard", "/health": "Vehicle Health", "/twin": "Vehicle Digital Twin",
   "/diagnostics": "Diagnostics", "/anomaly": "Anomaly Analysis", "/sensors": "Sensor Analytics",
   "/rul": "RUL & Prognostics", "/xai": "Explainable AI", "/whatif": "What-If Simulator",
   "/maintenance": "Maintenance Center", "/reports": "Reports", "/history": "History",
@@ -91,7 +98,9 @@ function TopBar() {
   const { vehicles, vehicleId, setVehicleId, dataSource, doUpload, uploading } = useVehicle();
   const fileRef = useRef(null);
   const location = useLocation();
-  const title = PAGE_TITLES[location.pathname] || "Vehicle Diagnostic Console";
+  // ignore a trailing slash so "/dashboard/" resolves the same title as "/dashboard"
+  const path = location.pathname.replace(/\/+$/, "") || "/";
+  const title = PAGE_TITLES[path] || "Vehicle Diagnostic Console";
   const isUpload = dataSource?.mode === "upload";
 
   const onPick = (e) => {
@@ -148,33 +157,59 @@ function UploadErrorBanner() {
   );
 }
 
+// Layout route: sidebar + top bar + banner around every page except the welcome screen.
+function AppShell() {
+  return (
+    <div className="app-shell">
+      <Sidebar />
+      <div className="main-col">
+        <TopBar />
+        <UploadErrorBanner />
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+
+// Fallback for unknown URLs: stays inside the shell and links to a valid route.
+function NotFound() {
+  const { pathname } = useLocation();
+  return (
+    <div className="page">
+      <div className="empty-state">
+        <div>No page exists at <span className="mono">{pathname}</span>.</div>
+        <div style={{ marginTop: 14 }}>
+          <Link className="btn btn-primary btn-sm" to="/dashboard">Go to Dashboard</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <VehicleProvider>
-      <div className="app-shell">
-        <Sidebar />
-        <div className="main-col">
-          <TopBar />
-          <UploadErrorBanner />
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/health" element={<VehicleHealth />} />
-            <Route path="/twin" element={<DigitalTwin />} />
-            <Route path="/diagnostics" element={<Diagnostics />} />
-            <Route path="/anomaly" element={<AnomalyAnalysis />} />
-            <Route path="/sensors" element={<SensorAnalytics />} />
-            <Route path="/rul" element={<RulPrognostics />} />
-            <Route path="/xai" element={<ExplainableAI />} />
-            <Route path="/whatif" element={<WhatIf />} />
-            <Route path="/maintenance" element={<MaintenanceCenter />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/models" element={<ModelAnalytics />} />
-            <Route path="/quality" element={<DataQuality />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<Welcome />} />
+        <Route element={<AppShell />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/health" element={<VehicleHealth />} />
+          <Route path="/twin" element={<DigitalTwin />} />
+          <Route path="/diagnostics" element={<Diagnostics />} />
+          <Route path="/anomaly" element={<AnomalyAnalysis />} />
+          <Route path="/sensors" element={<SensorAnalytics />} />
+          <Route path="/rul" element={<RulPrognostics />} />
+          <Route path="/xai" element={<ExplainableAI />} />
+          <Route path="/whatif" element={<WhatIf />} />
+          <Route path="/maintenance" element={<MaintenanceCenter />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/models" element={<ModelAnalytics />} />
+          <Route path="/quality" element={<DataQuality />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </VehicleProvider>
   );
 }

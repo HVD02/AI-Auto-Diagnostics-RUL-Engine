@@ -125,10 +125,24 @@ npm run dev
 # → http://localhost:5173  (proxies /api to the backend on :8000)
 ```
 
-### 3. Open the app
+### 3. Open the application
 
-Visit `http://localhost:5173`, the Dashboard loads automatically with the
-first demo vehicle selected.
+Visit `http://localhost:5173` to open the welcome screen.
+
+Click **ENTER DIAGNOSTICS** to access the Dashboard at
+`http://localhost:5173/dashboard`.
+
+The application retains the existing diagnostic pages, including
+Vehicle Health, Diagnostics, Anomaly Analysis, RUL & Prognostics,
+Explainable AI, Reports, History, and Data Quality.
+
+## Frontend Release
+
+Current frontend release: **v2.0.0**
+
+Version 2.0.0 introduces the redesigned welcome screen,
+the updated diagnostic dashboard, improved navigation,
+and corrected PDF report-download URL handling.
 
 ### Root convenience scripts
 

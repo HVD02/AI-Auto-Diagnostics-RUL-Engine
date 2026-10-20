@@ -33,10 +33,21 @@ export const whatIfUpload = (sensor, delta) =>
 export const getHistory = (vehicle_id, limit = 50) =>
   api.get("/history", { params: { vehicle_id, limit } }).then(r => r.data);
 
-export const createReport = (vehicle_id) => api.post(`/report/${vehicle_id}`).then(r => r.data);
-export const getReports = (vehicle_id) => api.get("/reports", { params: { vehicle_id } }).then(r => r.data);
-export const reportDownloadUrl = (filename) => `/api/report/download/${filename}`;
+export const createReport = (vehicle_id) =>
+  api.post(`/report/${vehicle_id}`).then(r => r.data);
 
-export const maintenanceSearch = (q) => api.get("/maintenance/search", { params: { q } }).then(r => r.data);
+export const getReports = (vehicle_id) =>
+  api.get("/reports", { params: { vehicle_id } }).then(r => r.data);
+
+// Extract the filename from either a Windows path or a POSIX path.
+export const reportFilename = (pathOrName) =>
+  String(pathOrName ?? "").split(/[\\/]/).filter(Boolean).pop() || "";
+
+// Generate the download URL using only the PDF filename.
+export const reportDownloadUrl = (pathOrName) =>
+  `/api/report/download/${encodeURIComponent(reportFilename(pathOrName))}`;
+
+export const maintenanceSearch = (q) =>
+  api.get("/maintenance/search", { params: { q } }).then(r => r.data);
 
 export default api;

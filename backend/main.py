@@ -275,10 +275,40 @@ def create_report(vehicle_id: str):
 
 @app.get("/api/report/download/{filename}")
 def download_report(filename: str):
-    fpath = os.path.join(report_mod.REPORT_DIR, filename)
-    if not os.path.exists(fpath):
-        raise HTTPException(404, "report not found")
-    return FileResponse(fpath, media_type="application/pdf", filename=filename)
+    # Reject directory traversal and path separators.
+    if (
+        not filename
+        or filename in {".", ".."}
+        or "/" in filename
+        or "\\" in filename
+    ):
+        raise HTTPException(status_code=400, detail="Invalid report filename")
+
+    # Resolve the report directory and requested file to absolute paths.
+    report_dir = os.path.realpath(report_mod.REPORT_DIR)
+    fpath = os.path.realpath(os.path.join(report_dir, filename))
+
+    # Ensure the resolved file remains inside the report directory.
+    try:
+        if os.path.commonpath([report_dir, fpath]) != report_dir:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid report filename",
+            )
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid report filename",
+        )
+
+    if not os.path.isfile(fpath):
+        raise HTTPException(status_code=404, detail="report not found")
+
+    return FileResponse(
+        fpath,
+        media_type="application/pdf",
+        filename=filename,
+    )
 
 
 @app.get("/api/reports")
