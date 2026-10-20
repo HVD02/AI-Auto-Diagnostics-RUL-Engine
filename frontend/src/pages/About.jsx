@@ -111,7 +111,7 @@ function UploadResult({ result }) {
           scenario anytime from the vehicle selector in the top bar.
         </p>
         <div className="pill-row">
-          <Link className="btn btn-primary btn-sm" to="/"><ArrowRight size={13} /> Go to Dashboard</Link>
+          <Link className="btn btn-primary btn-sm" to="/dashboard"><ArrowRight size={13} /> Go to Dashboard</Link>
           <Link className="btn btn-sm" to="/sensors">View Sensor Charts</Link>
           <Link className="btn btn-sm" to="/reports"><FileText size={13} /> Generate PDF Report</Link>
         </div>
