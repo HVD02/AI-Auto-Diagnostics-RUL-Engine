@@ -1,0 +1,515 @@
+/* ============================================================
+   Welcome.css
+   Welcome screen styles for frontend/src/pages/Welcome.jsx
+
+   Scope: every selector (and every @keyframes name) starts with
+   "wlc". Nothing here targets bare elements or shared classes,
+   so no other page is affected. Colors come from the existing
+   :root tokens in index.css (read-only) with hard-coded fallbacks.
+   ============================================================ */
+
+/* ---------- root, local tokens, background ---------- */
+.wlc {
+  --wlc-bg: var(--bg-0, #0a0d10);
+  --wlc-panel: var(--bg-1, #10151a);
+  --wlc-raise: var(--bg-2, #161c22);
+  --wlc-raise-2: var(--bg-3, #1d242b);
+  --wlc-line: var(--line, #262f37);
+  --wlc-line-soft: var(--line-soft, #1b2229);
+  --wlc-text-0: var(--text-0, #eef2f5);
+  --wlc-text-1: var(--text-1, #a9b4bd);
+  --wlc-accent: var(--accent, #2dd4e8);
+  --wlc-accent-dim: var(--accent-dim, #16505a);
+  --wlc-ok: var(--ok, #34d399);
+  --wlc-ok-dim: var(--ok-dim, #113328);
+  --wlc-crit: var(--crit, #f87171);
+  --wlc-crit-dim: var(--crit-dim, #3a1414);
+  --wlc-info: var(--info, #60a5fa);
+  --wlc-sans: var(--sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  --wlc-mono: var(--mono, 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace);
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(32px, 6vh, 64px) clamp(20px, 5vw, 56px);
+  overflow: hidden;
+  color: var(--wlc-text-0);
+  font-family: var(--wlc-sans);
+  background:
+    radial-gradient(900px 520px at 12% 6%, rgba(45, 212, 232, 0.10), transparent 62%),
+    radial-gradient(720px 520px at 96% 92%, rgba(45, 212, 232, 0.05), transparent 62%),
+    linear-gradient(180deg, var(--wlc-bg) 0%, #0c1014 100%);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wlc,
+.wlc *,
+.wlc *::before,
+.wlc *::after {
+  box-sizing: border-box;
+}
+
+/* Full-bleed technical grid + decorative sensor waves (aria-hidden in JSX) */
+.wlc-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  color: var(--wlc-line-soft);
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 55%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 85% 80% at 50% 55%, #000 30%, transparent 100%);
+}
+
+.wlc-wave {
+  stroke: var(--wlc-accent);
+  animation: wlc-breathe 6s ease-in-out infinite alternate;
+}
+.wlc-wave-1 {
+  --wlc-wave-o: 0.38;
+  opacity: 0.38;
+}
+.wlc-wave-2 {
+  --wlc-wave-o: 0.2;
+  opacity: 0.2;
+  animation-duration: 7.5s;
+  animation-delay: -2s;
+}
+
+/* ---------- layout ---------- */
+.wlc-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 48px;
+  align-items: center;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.wlc-hero,
+.wlc-panel {
+  animation: wlc-rise 0.6s ease both;
+}
+.wlc-panel {
+  animation-delay: 0.12s;
+}
+
+/* ---------- hero copy ---------- */
+.wlc-hero {
+  min-width: 0;
+}
+
+.wlc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--wlc-accent);
+  font-family: var(--wlc-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.wlc-eyebrow svg {
+  flex-shrink: 0;
+}
+
+.wlc-title {
+  margin: 0 0 14px;
+  color: var(--wlc-text-0);
+  font-size: clamp(1.85rem, 1.1rem + 3.4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.wlc-amp {
+  color: var(--wlc-accent);
+  font-weight: 500;
+}
+
+.wlc-sub {
+  margin: 0 0 14px;
+  max-width: 52ch;
+  color: var(--wlc-text-0);
+  font-size: clamp(1rem, 0.9rem + 0.45vw, 1.2rem);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.wlc-desc {
+  margin: 0 0 28px;
+  max-width: 56ch;
+  color: var(--wlc-text-1);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+/* ---------- primary button ---------- */
+.wlc-cta {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 13px 26px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--wlc-accent);
+  color: #04181c;
+  font-family: var(--wlc-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 232, 0.45),
+    0 10px 30px -12px rgba(45, 212, 232, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.wlc-cta svg {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+.wlc-cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 232, 0.65),
+    0 14px 34px -10px rgba(45, 212, 232, 0.7);
+}
+.wlc-cta:hover svg {
+  transform: translateX(3px);
+}
+.wlc-cta:active {
+  transform: translateY(0);
+  filter: brightness(0.97);
+}
+.wlc-cta:focus-visible {
+  outline: 2px solid var(--wlc-text-0);
+  outline-offset: 3px;
+}
+
+/* ---------- capability tags ---------- */
+.wlc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.wlc-tag {
+  padding: 5px 12px;
+  border: 1px solid var(--wlc-line);
+  border-radius: 999px;
+  background: rgba(22, 28, 34, 0.6);
+  color: var(--wlc-text-1);
+  font-family: var(--wlc-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ---------- pipeline status panel ---------- */
+.wlc-panel {
+  position: relative;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--wlc-line);
+  border-radius: 12px;
+  background: rgba(16, 21, 26, 0.82);
+  box-shadow: 0 24px 60px -34px rgba(0, 0, 0, 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.wlc-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 12px;
+  left: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(45, 212, 232, 0.55), transparent);
+  pointer-events: none;
+}
+
+.wlc-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+}
+.wlc-panel-title {
+  color: var(--wlc-text-1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* backend status chip */
+.wlc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--wlc-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.wlc-status-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.wlc-status-checking {
+  background: var(--wlc-raise-2);
+  color: var(--wlc-text-1);
+}
+.wlc-status-checking .wlc-status-dot {
+  animation: wlc-pulse 1.2s ease-in-out infinite;
+}
+.wlc-status-online {
+  background: var(--wlc-ok-dim);
+  color: var(--wlc-ok);
+}
+.wlc-status-online .wlc-status-dot {
+  box-shadow: 0 0 8px currentColor;
+}
+.wlc-status-offline {
+  background: var(--wlc-crit-dim);
+  color: var(--wlc-crit);
+}
+
+.wlc-offline {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 8px;
+  background: rgba(58, 20, 20, 0.55);
+  color: var(--wlc-text-0);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.wlc-offline code {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  font-family: var(--wlc-mono);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
+/* model information rows */
+.wlc-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.wlc-row {
+  padding: 12px 0;
+  border-top: 1px solid var(--wlc-line-soft);
+}
+.wlc-row:first-child {
+  border-top: 0;
+  padding-top: 2px;
+}
+.wlc-row-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.wlc-row-name {
+  color: var(--wlc-text-0);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.wlc-row-metric {
+  color: var(--wlc-accent);
+  font-family: var(--wlc-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.wlc-row-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 5px;
+}
+.wlc-row-model {
+  color: var(--wlc-text-0);
+  font-family: var(--wlc-mono);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.wlc-row-data {
+  color: var(--wlc-text-1);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.wlc-muted {
+  margin: 0;
+  color: var(--wlc-text-1);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* synthetic-data note */
+.wlc-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--wlc-line-soft);
+  color: var(--wlc-text-1);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.wlc-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--wlc-info);
+}
+
+/* ---------- footer (limitations / safety) ---------- */
+.wlc-foot {
+  position: relative;
+  width: 100%;
+  max-width: 1120px;
+  margin: clamp(28px, 5vh, 44px) auto 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--wlc-line-soft);
+  color: var(--wlc-text-1);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* ---------- animation keyframes ---------- */
+@keyframes wlc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes wlc-breathe {
+  from {
+    opacity: calc(var(--wlc-wave-o, 0.3) * 0.55);
+    transform: translateY(0);
+  }
+  to {
+    opacity: var(--wlc-wave-o, 0.3);
+    transform: translateY(-6px);
+  }
+}
+@keyframes wlc-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .wlc-layout {
+    gap: 32px;
+  }
+}
+
+@media (max-width: 900px) {
+  .wlc-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .wlc-sub,
+  .wlc-desc {
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .wlc-cta {
+    width: 100%;
+  }
+  .wlc-panel {
+    padding: 16px;
+  }
+  .wlc-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+}
+
+@media (min-width: 901px) and (max-height: 640px) {
+  .wlc {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .wlc-desc {
+    margin-bottom: 20px;
+  }
+  .wlc-tags {
+    margin-top: 18px;
+  }
+}
+
+/* ---------- accessibility preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .wlc-hero,
+  .wlc-panel,
+  .wlc-wave,
+  .wlc-status-checking .wlc-status-dot {
+    animation: none;
+  }
+  .wlc-cta,
+  .wlc-cta svg {
+    transition: none;
+  }
+  .wlc-cta:hover,
+  .wlc-cta:hover svg,
+  .wlc-cta:active {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .wlc-cta {
+    border: 2px solid ButtonText;
+  }
+  .wlc-tag,
+  .wlc-panel,
+  .wlc-status,
+  .wlc-offline {
+    border: 1px solid CanvasText;
+  }
+  .wlc-status-dot {
+    background: CanvasText;
+  }
+}
