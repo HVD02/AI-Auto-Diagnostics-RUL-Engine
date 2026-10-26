@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Activity, ArrowRight, Info } from "lucide-react";
 import { getHealth, getModelMetrics } from "../api";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 import "./Welcome.css";
 
 const CAPABILITIES = [
@@ -89,6 +90,9 @@ export default function Welcome() {
 
   return (
     <main className="wlc" aria-labelledby="wlc-title">
+      <div className="theme-toggle-floating">
+        <ThemeToggle />
+      </div>
       <svg
         className="wlc-bg"
         viewBox="0 0 800 600"

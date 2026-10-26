@@ -1,0 +1,146 @@
+/* ============================================================
+   theme.css: central design tokens for dark and light themes.
+   Existing variable names are preserved so every page keeps working.
+   The theme is set by  <html data-theme="dark|light">  (index.html
+   inline script + ThemeContext.jsx).
+   ============================================================ */
+
+/* ---------- theme-independent tokens ---------- */
+:root {
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* type scale */
+  --fs-xs: 11.5px;
+  --fs-sm: 12.5px;
+  --fs-md: 14px;
+  --fs-lg: 18px;
+  --fs-xl: 22px;
+  --fs-kpi: 32px;
+}
+
+/* ---------- DARK (default) ---------- */
+:root,
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-0: #080d10;
+  --bg-soft: #0c1317;
+  --bg-1: #111a1f;
+  --bg-2: #162228;
+  --bg-3: #1d2c33;
+  --line: rgba(173, 204, 211, 0.13);
+  --line-soft: rgba(173, 204, 211, 0.08);
+  --border-strong: rgba(173, 204, 211, 0.23);
+
+  --text-0: #eef5f6;
+  --text-1: #c0cdd1;
+  --text-2: #87999f;
+
+  --accent: #38d6df;
+  --accent-strong: #12b9c7;
+  --accent-text: #38d6df;
+  --accent-rgb: 56, 214, 223;
+  --accent-dim: #16505a;
+  --accent-glow: rgba(56, 214, 223, 0.16);
+  --on-accent: #04181c;
+  --focus-ring: #38d6df;
+
+  --ok: #4be0ad;   --ok-dim: #0f2f26;
+  --warn: #f4bb4f; --warn-dim: #33280e;
+  --mod: #fb923c;  --mod-dim: #36200e;
+  --crit: #ff777c; --crit-dim: #381518;
+  --info: #60a5fa; --info-dim: #12263f;
+  --ok-border: rgba(75, 224, 173, 0.3);
+  --warn-border: rgba(244, 187, 79, 0.3);
+  --crit-border: rgba(255, 119, 124, 0.3);
+  --info-border: rgba(96, 165, 250, 0.3);
+
+  --surface-glass: rgba(12, 19, 23, 0.85);
+  --grid: rgba(147, 186, 194, 0.045);
+  --shadow: 0 26px 80px rgba(0, 0, 0, 0.27);
+  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  /* per-sensor chart colours */
+  --chart-1: #f87171; --chart-2: #60a5fa; --chart-3: #fbbf24; --chart-4: #34d399; --chart-5: #fb923c;
+  --chart-6: #a78bfa; --chart-7: #2dd4e8; --chart-8: #f472b6; --chart-9: #facc15; --chart-10: #4ade80;
+}
+
+/* ---------- LIGHT ---------- */
+html[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-0: #f4f8f8;
+  --bg-soft: #edf3f3;
+  --bg-1: #ffffff;
+  --bg-2: #f1f7f7;
+  --bg-3: #e3eded;
+  --line: rgba(28, 55, 63, 0.14);
+  --line-soft: rgba(28, 55, 63, 0.08);
+  --border-strong: rgba(28, 55, 63, 0.24);
+
+  --text-0: #13262d;
+  --text-1: #40555d;
+  --text-2: #5b7077;
+
+  --accent: #007f8b;
+  --accent-strong: #006b75;
+  --accent-text: #006b75;
+  --accent-rgb: 0, 127, 139;
+  --accent-dim: #dff1f2;
+  --accent-glow: rgba(0, 127, 139, 0.1);
+  --on-accent: #ffffff;
+  --focus-ring: #006b75;
+
+  --ok: #067250;   --ok-dim: #def3ea;
+  --warn: #8a5a00; --warn-dim: #fbefd3;
+  --mod: #a14308;  --mod-dim: #fbe5d0;
+  --crit: #b7313d; --crit-dim: #f9dfe1;
+  --info: #1d5fb8; --info-dim: #e1ecfa;
+  --ok-border: rgba(6, 114, 80, 0.3);
+  --warn-border: rgba(138, 90, 0, 0.3);
+  --crit-border: rgba(183, 49, 61, 0.3);
+  --info-border: rgba(29, 95, 184, 0.3);
+
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --grid: rgba(28, 55, 63, 0.05);
+  --shadow: 0 22px 60px rgba(29, 63, 69, 0.09);
+  --shadow-sm: 0 1px 2px rgba(19, 38, 45, 0.06), 0 4px 14px rgba(19, 38, 45, 0.05);
+
+  --chart-1: #c8323f; --chart-2: #1d6fd1; --chart-3: #a06a00; --chart-4: #0a8a5f; --chart-5: #c2570c;
+  --chart-6: #7c4fd6; --chart-7: #00899a; --chart-8: #c2306f; --chart-9: #8a7400; --chart-10: #2f8f3a;
+}
+
+/* ============================================================
+   Light-theme compatibility for pages that hardcode dark colours
+   (Welcome.css, Dashboard.css). Temporary: Phases 2 and 3 replace
+   these pages' styling and this block can then be deleted.
+   ============================================================ */
+html[data-theme="light"] .wlc {
+  background:
+    radial-gradient(900px 520px at 12% 6%, rgba(var(--accent-rgb), 0.12), transparent 62%),
+    radial-gradient(720px 520px at 96% 92%, rgba(var(--accent-rgb), 0.06), transparent 62%),
+    linear-gradient(180deg, var(--bg-0) 0%, var(--bg-soft) 100%);
+}
+html[data-theme="light"] .wlc-tag { background: rgba(255, 255, 255, 0.7); }
+html[data-theme="light"] .wlc-panel { background: rgba(255, 255, 255, 0.88); box-shadow: var(--shadow); }
+html[data-theme="light"] .wlc-offline { background: var(--crit-dim); border-color: var(--crit-border); }
+html[data-theme="light"] .wlc-offline code { background: rgba(19, 38, 45, 0.08); }
+html[data-theme="light"] .wlc-cta {
+  background: var(--accent-strong);
+  color: var(--on-accent);
+  box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.5), 0 10px 30px -12px rgba(var(--accent-rgb), 0.55);
+}
+html[data-theme="light"] .dv2 .dv2-source-demo { background: var(--warn-dim); border-color: var(--warn-border); }
+html[data-theme="light"] .dv2 .dv2-source-upload {
+  background: var(--accent-dim);
+  border-color: rgba(var(--accent-rgb), 0.35);
+  color: var(--accent-text);
+}
+html[data-theme="light"] .dv2 .dv2-card { box-shadow: var(--shadow-sm); }
+html[data-theme="light"] .dv2 .dv2-tip { box-shadow: var(--shadow); }

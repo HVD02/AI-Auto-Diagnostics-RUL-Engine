@@ -6,6 +6,7 @@ import {
   BarChart3, ShieldCheck, FileText, Settings, Zap, UploadCloud, FileUp,
 } from "lucide-react";
 import { VehicleProvider, useVehicle } from "./VehicleContext.jsx";
+import ThemeToggle from "./components/ThemeToggle.jsx";
 
 import Welcome from "./pages/Welcome.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -120,6 +121,7 @@ function TopBar() {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <ThemeToggle />
         <button className="btn btn-sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
           <FileUp size={13} /> {uploading ? "Uploading…" : "Upload CSV"}
         </button>

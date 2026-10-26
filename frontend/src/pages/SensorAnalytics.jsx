@@ -5,16 +5,16 @@ import { getTelemetry, getCurrentUploadTelemetry } from "../api";
 import { useVehicle } from "../VehicleContext.jsx";
 
 const SENSOR_META = {
-  coolant_temp_c: { label: "Coolant Temp (°C)", color: "#f87171" },
-  oil_pressure_kpa: { label: "Oil Pressure (kPa)", color: "#60a5fa" },
-  rpm: { label: "RPM", color: "#fbbf24" },
-  engine_load_pct: { label: "Engine Load (%)", color: "#34d399" },
-  intake_temp_c: { label: "Intake Temp (°C)", color: "#fb923c" },
-  fuel_rate_lph: { label: "Fuel Rate (L/h)", color: "#a78bfa" },
-  throttle_pos_pct: { label: "Throttle Position (%)", color: "#2dd4e8" },
-  vibration_g: { label: "Vibration (g)", color: "#f472b6" },
-  battery_voltage_v: { label: "Battery Voltage (V)", color: "#facc15" },
-  speed_kph: { label: "Speed (km/h)", color: "#4ade80" },
+  coolant_temp_c: { label: "Coolant Temp (°C)", color: "var(--chart-1)" },
+  oil_pressure_kpa: { label: "Oil Pressure (kPa)", color: "var(--chart-2)" },
+  rpm: { label: "RPM", color: "var(--chart-3)" },
+  engine_load_pct: { label: "Engine Load (%)", color: "var(--chart-4)" },
+  intake_temp_c: { label: "Intake Temp (°C)", color: "var(--chart-5)" },
+  fuel_rate_lph: { label: "Fuel Rate (L/h)", color: "var(--chart-6)" },
+  throttle_pos_pct: { label: "Throttle Position (%)", color: "var(--chart-7)" },
+  vibration_g: { label: "Vibration (g)", color: "var(--chart-8)" },
+  battery_voltage_v: { label: "Battery Voltage (V)", color: "var(--chart-9)" },
+  speed_kph: { label: "Speed (km/h)", color: "var(--chart-10)" },
 };
 
 function detectStuck(arr) {
