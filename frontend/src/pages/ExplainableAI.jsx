@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { Card, Loading, ErrorBox, InfoBox } from "../components/ui.jsx";
+import { Card, Loading, ErrorBox, InfoBox, Badge } from "../components/ui.jsx";
+import { ShapBars } from "../components/DiagnosisParts.jsx";
 import { diagnoseSample, diagnose, getModelMetrics } from "../api";
+import "./DiagnosisPages.css";
 
 function buildSentence(shap) {
   if (!shap || !shap.length) return "No explanation available for this prediction.";
@@ -10,83 +12,97 @@ function buildSentence(shap) {
 }
 
 export default function ExplainableAI() {
-  const [sample, setSample] = useState(null);
   const [result, setResult] = useState(null);
   const [metrics, setMetrics] = useState(null);
+  const [metricsFailed, setMetricsFailed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const draw = () => {
     setLoading(true);
+    setError(null);
     diagnoseSample().then(d => {
-      setSample(d.sample_features);
       const { Fault, ...features } = d.sample_features;
       return diagnose(features);
-    }).then(setResult).finally(() => setLoading(false));
+    }).then(setResult)
+      .catch(e => setError(e?.response?.data?.detail || e.message))
+      .finally(() => setLoading(false));
   };
 
-  useEffect(() => { draw(); getModelMetrics().then(setMetrics); }, []);
+  useEffect(() => {
+    draw();
+    getModelMetrics().then(setMetrics).catch(() => setMetricsFailed(true));
+  }, []);
 
-  const globalImportance = metrics?.diagnosis?.test_metrics?.classification_report
-    ? null : null; // global importance surfaced via feature list below instead
+  const features = metrics?.diagnosis?.features;
 
   return (
     <div className="page">
       <div className="page-header">
         <h2>Explainable AI</h2>
-        <p>SHAP (TreeExplainer) applied to the XGBoost fault-diagnosis model — global and local, generated live.</p>
+        <p>
+          SHAP (TreeExplainer) applied to the XGBoost fault-diagnosis model. A local explanation is
+          generated live for each sampled EngineFaultDB row, and the model's full feature set is listed
+          for context.
+        </p>
       </div>
 
-      <div className="pill-row" style={{ marginBottom: 14 }}>
+      <div className="dgx-note">
+        <InfoBox>
+          SHAP values explain how the trained model reached this prediction. They are not proof of a
+          physical cause. Fault classes 1–3 are unnamed in the source dataset.
+        </InfoBox>
+      </div>
+
+      <div className="pill-row dgx-toolbar">
         <button className="btn btn-primary btn-sm" onClick={draw} disabled={loading}>
-          <RefreshCw size={13} className={loading ? "spin" : ""} /> New prediction to explain
+          <RefreshCw size={13} className={loading ? "spin" : ""} aria-hidden="true" /> New prediction to explain
         </button>
       </div>
 
       {loading && <Loading />}
+      {error && <div role="alert"><ErrorBox message={error} /></div>}
 
       {result && (
-        <>
-          <Card title="Human-readable Explanation">
-            <p style={{ fontSize: 14, lineHeight: 1.6 }}>{buildSentence(result.shap_explanation)}</p>
-            <div style={{ fontSize: 11, color: "var(--text-2)", marginTop: 6 }}>
-              Generated directly from the SHAP values below, not a template with invented sensor names.
+        <div className="dgx-stack">
+          <Card title="Human-readable Explanation" className="dgx-hero">
+            <p className="dgx-callout">{buildSentence(result.shap_explanation)}</p>
+            <div className="pill-row" style={{ marginTop: 12 }}>
+              <Badge status="info">{result.predicted_label}</Badge>
+              <Badge status="neutral">{(result.confidence * 100).toFixed(1)}% confidence</Badge>
             </div>
+            <p className="dgx-cap">
+              Generated directly from the SHAP values below, not a template with invented sensor names.
+            </p>
           </Card>
-
-          <div style={{ height: 14 }} />
 
           <div className="grid grid-2">
             <Card title="Local Explanation (this prediction)">
-              {result.shap_explanation ? (
-                <div className="fault-list">
-                  {result.shap_explanation.map(e => (
-                    <div className="fault-row" key={e.feature}>
-                      <span className="mono" style={{ fontSize: 12 }}>{e.feature}</span>
-                      <div className="bar-bg">
-                        <div className="bar-fill" style={{
-                          width: `${Math.min(100, Math.abs(e.shap_value) * 20)}%`,
-                          background: e.shap_value >= 0 ? "var(--crit)" : "var(--ok)",
-                        }} />
-                      </div>
-                      <span className="mono" style={{ fontSize: 11 }}>{e.shap_value}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : <InfoBox>Unavailable.</InfoBox>}
+              {result.shap_explanation
+                ? <ShapBars items={result.shap_explanation} legend />
+                : <InfoBox>Unavailable.</InfoBox>}
             </Card>
 
             <Card title="Model Features Used">
-              <p style={{ fontSize: 12, color: "var(--text-2)", marginBottom: 8 }}>
-                Full feature set the model was trained on ({metrics?.diagnosis?.features?.length || "…"} features):
-              </p>
-              <div className="pill-row">
-                {metrics?.diagnosis?.features?.map(f => (
-                  <span key={f} className="badge badge-neutral">{f}</span>
-                ))}
-              </div>
+              {features ? (
+                <>
+                  <p className="dgx-cap" style={{ marginTop: 0, marginBottom: 10 }}>
+                    Full feature set the model was trained on ({features.length} features):
+                  </p>
+                  <div className="dgx-chips">
+                    {features.map(f => (
+                      <span key={f} className="badge badge-neutral">{f}</span>
+                    ))}
+                  </div>
+                </>
+              ) : metricsFailed ? (
+                <p className="dgx-cap" style={{ margin: 0 }}>Feature list unavailable right now.</p>
+              ) : (
+                <Loading />
+              )}
             </Card>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

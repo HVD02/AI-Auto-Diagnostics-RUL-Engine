@@ -1,0 +1,73 @@
+/* ============================================================
+   DiagnosisPages.css: Diagnostics, Explainable AI, What-If.
+   Prefixes: dgx- (shared), wi- (What-If). Tokens from theme.css only.
+   ============================================================ */
+
+.dgx-toolbar { margin-bottom: 14px; }
+.dgx-note { margin-bottom: 14px; }
+.dgx-stack { display: flex; flex-direction: column; gap: 14px; }
+
+.dgx-primary {
+  margin: 0 0 12px;
+  font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem);
+  font-weight: 700; letter-spacing: -0.02em; line-height: 1.2;
+  color: var(--text-0); overflow-wrap: anywhere;
+}
+.dgx-primary-sm { font-size: 1.1rem; margin-bottom: 10px; }
+.dgx-meta { margin: 10px 0 0; font-size: 12px; line-height: 1.55; color: var(--text-1); }
+.dgx-cap { margin: 10px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--text-1); }
+
+.dgx-list { margin: 0; padding: 0; list-style: none; }
+.dgx-lbl { flex: 0 1 40%; min-width: 0; font-size: 12.5px; color: var(--text-0); overflow-wrap: anywhere; }
+.dgx-val { flex-shrink: 0; min-width: 48px; text-align: right; font-size: 12px; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.dgx-num { text-align: right; }
+
+.page .fault-row .bar-fill.dgx-pos { background: var(--crit); }
+.page .fault-row .bar-fill.dgx-neg { background: var(--ok); }
+
+.dgx-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-1); }
+.dgx-key { display: inline-flex; align-items: center; gap: 7px; }
+.dgx-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.dgx-swatch.dgx-pos { background: var(--crit); }
+.dgx-swatch.dgx-neg { background: var(--ok); }
+
+.dgx-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.page .card.dgx-hero { border-left: 3px solid var(--accent); }
+.dgx-callout { margin: 0; font-size: clamp(1rem, 0.95rem + 0.4vw, 1.2rem); line-height: 1.55; color: var(--text-0); }
+.dgx-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- What-If ---------- */
+.wi-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 14px; align-items: start; }
+.wi-results { display: flex; flex-direction: column; gap: 14px; min-width: 0; position: sticky; top: 76px; }
+@media (max-width: 1100px) {
+  .wi-layout { grid-template-columns: minmax(0, 1fr); }
+  .wi-results { position: static; }
+}
+
+.wi-sliders { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2px 24px; }
+.wi-sliders .slider-row { margin-bottom: 12px; }
+.wi-sliders .slider-head label { font-size: 12.5px; }
+.wi-sliders label.is-active { color: var(--accent-text); font-weight: 600; }
+
+/* visible track in both themes + filled portion; thumb styled for Chromium and Firefox */
+.wi-sliders input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 999px; outline-offset: 6px;
+  background: linear-gradient(to right, var(--accent) var(--p, 0%), var(--border-strong) var(--p, 0%));
+}
+.wi-sliders input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-1); box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
+}
+.wi-sliders input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg-1); box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
+}
+.wi-sliders input[type="range"]::-moz-range-track { background: transparent; }
+
+.wi-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--text-1); }
+.wi-hint { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--text-1); }

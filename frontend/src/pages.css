@@ -1,0 +1,133 @@
+/* ============================================================
+   pages.css: shared design layer for the application pages
+   (everything except the Dashboard, which keeps Dashboard.css
+   via :not(.dv2) where a rule would otherwise conflict).
+   Colours come only from theme.css tokens. CSS-only: no page
+   logic or markup depends on this file.
+   ============================================================ */
+
+/* ---------- page header ---------- */
+.page-header h2 {
+  font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.page-header p {
+  max-width: 78ch;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+/* gentle entrance (opacity only, so it never creates a containing block) */
+@media (prefers-reduced-motion: no-preference) {
+  .page:not(.dv2) { animation: pg-in 0.35s var(--ease) both; }
+}
+@keyframes pg-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- cards ---------- */
+.page .card { min-width: 0; }
+.page:not(.dv2) .card { padding: 18px; }
+.page:not(.dv2) .card-title {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--text-0);
+}
+.page .grid > * { min-width: 0; }
+.page .card-hero .value { letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+/* ---------- key/value rows and ranked rows ---------- */
+.page:not(.dv2) .kv-row { gap: 12px; padding: 8px 0; }
+.page:not(.dv2) .kv-row .k { color: var(--text-1); }
+.page:not(.dv2) .kv-row .v { min-width: 0; text-align: right; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.page .fault-row .bar-bg { min-width: 36px; }
+.page .fault-row .bar-fill { background: linear-gradient(90deg, var(--accent-strong), var(--accent)); }
+
+/* ---------- tables ---------- */
+.page .card:has(table.data-table),
+.page .card:has(.data-table) { overflow-x: auto; }
+.page .data-table th { white-space: nowrap; background: transparent; }
+.page .data-table td { font-variant-numeric: tabular-nums; }
+.page .data-table tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- buttons and pills ---------- */
+.page .btn { min-height: 34px; }
+.page .btn-sm { min-height: 30px; }
+.page a.btn { text-decoration: none; }
+.page .pill-row .btn { min-height: 32px; }
+
+/* ---------- form controls ---------- */
+.page select,
+.page textarea,
+.page input:not([type="range"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]) {
+  min-height: 36px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg-2);
+  color: var(--text-0);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  transition: border-color 0.15s, background 0.15s;
+}
+.page textarea { min-height: 84px; line-height: 1.55; }
+.page select:hover,
+.page textarea:hover,
+.page input:not([type="range"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):hover { border-color: var(--border-strong); }
+.page select:focus-visible,
+.page textarea:focus-visible,
+.page input:focus-visible { border-color: var(--accent); }
+.page select option { background: var(--bg-1); color: var(--text-0); }
+.page input::placeholder,
+.page textarea::placeholder { color: var(--text-2); opacity: 1; }
+.page select:disabled,
+.page textarea:disabled,
+.page input:disabled { opacity: 0.55; cursor: not-allowed; }
+.page input[type="checkbox"],
+.page input[type="radio"],
+.page input[type="range"] { accent-color: var(--accent); }
+.page label { color: var(--text-1); }
+
+/* ---------- twin cells, upload zone ---------- */
+.page .twin-cell { transition: border-color 0.2s ease, transform 0.2s var(--ease); }
+.page .twin-cell:hover { border-color: rgba(var(--accent-rgb), 0.45); }
+.page .upload-drop { border-radius: var(--radius); }
+
+/* ---------- charts (every page) ---------- */
+.page .recharts-wrapper { max-width: 100%; }
+.page .recharts-text,
+.page .recharts-cartesian-axis-tick-value { font-family: var(--mono); }
+.page .recharts-cartesian-axis-tick-value { fill: var(--text-1); }
+.page .recharts-tooltip-wrapper { z-index: 5; outline: none; }
+/* Recharts' default tooltip is an inline-styled white box; make it follow the theme. */
+.page .recharts-default-tooltip {
+  background: var(--bg-2) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  color: var(--text-0);
+}
+.page .recharts-tooltip-label { color: var(--text-1); }
+.page .recharts-legend-wrapper { max-width: 100%; }
+
+/* ---------- states ---------- */
+.page .empty-state { font-size: 13px; line-height: 1.6; }
+.page .loading-state { font-size: 13px; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 680px) {
+  .page:not(.dv2) .card { padding: 14px; }
+  .page .data-table th,
+  .page .data-table td { padding: 8px 8px; }
+  .page .page-header { margin-bottom: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page .twin-cell,
+  .page select,
+  .page textarea,
+  .page input { transition: none; }
+}

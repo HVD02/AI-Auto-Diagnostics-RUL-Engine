@@ -1,0 +1,144 @@
+/* ============================================================
+   shell.css: responsive application shell (sidebar drawer,
+   top bar, skip link). Everything is scoped under .app-shell so
+   it outranks index.css regardless of import order.
+   Colours come from theme.css tokens only.
+   ============================================================ */
+
+.app-shell .skip-link {
+  position: fixed;
+  left: 12px;
+  top: -64px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.app-shell .skip-link:focus { top: 12px; }
+
+/* ---------- sidebar ---------- */
+.app-shell .sidebar {
+  height: 100vh;
+  height: 100dvh;
+}
+.app-shell .sidebar-close,
+.app-shell .menu-btn,
+.app-shell .sidebar-backdrop {
+  display: none;
+}
+.app-shell .sidebar-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px;
+  min-width: 34px;
+  min-height: 34px;
+  justify-content: center;
+}
+.app-shell .nav-link { min-height: 36px; }
+
+/* ---------- top bar ---------- */
+.app-shell .topbar {
+  height: auto;
+  min-height: 56px;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 8px 22px;
+}
+.app-shell .topbar-lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.app-shell .topbar-titles { min-width: 0; }
+.app-shell .topbar-title,
+.app-shell .topbar-sub {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-shell .topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.app-shell .topbar-actions .vehicle-select {
+  min-width: 0;
+  max-width: 260px;
+  min-height: 34px;
+}
+.app-shell .topbar-actions .btn,
+.app-shell .menu-btn { min-height: 34px; }
+.app-shell .main-content {
+  flex: 1;
+  min-width: 0;
+  outline: none;
+}
+
+/* ---------- tablet and mobile: drawer ---------- */
+@media (max-width: 900px) {
+  .app-shell .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(86vw, 300px);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.28s var(--ease), visibility 0s linear 0.28s;
+  }
+  .app-shell .sidebar.is-open {
+    transform: none;
+    visibility: visible;
+    box-shadow: var(--shadow);
+    transition: transform 0.28s var(--ease), visibility 0s;
+  }
+  .app-shell .sidebar-brand { padding-right: 56px; }
+  .app-shell .sidebar-close { display: inline-flex; }
+  .app-shell .menu-btn {
+    display: inline-flex;
+    padding: 6px;
+    min-width: 36px;
+    justify-content: center;
+  }
+  .app-shell .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(4, 10, 12, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .app-shell .sidebar-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .app-shell .topbar { padding: 8px 14px; }
+  .app-shell .main-content .page { padding: 16px; }
+}
+
+/* ---------- small phones ---------- */
+@media (max-width: 640px) {
+  .app-shell .topbar-actions { order: 3; width: 100%; }
+  .app-shell .topbar-actions .vehicle-select { flex: 1 1 auto; max-width: none; }
+  .app-shell .topbar-actions .upload-label,
+  .app-shell .topbar-actions .zap-icon { display: none; }
+  .app-shell .topbar-actions .upload-btn { padding: 6px 10px; }
+  .app-shell .topbar-lead { flex: 1 1 0; }
+  .app-shell .topbar-sub { font-size: 10.5px; }
+  .app-shell .topbar-tools { display: flex; align-items: center; gap: 8px; }
+}
+@media (min-width: 641px) {
+  .app-shell .topbar-tools { display: contents; }
+}

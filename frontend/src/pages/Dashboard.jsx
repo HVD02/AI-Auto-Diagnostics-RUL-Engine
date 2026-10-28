@@ -3,14 +3,18 @@ import { Link } from "react-router-dom";
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
-import { Wrench, UploadCloud, Cpu, FileText, ShieldCheck, ExternalLink } from "lucide-react";
-import { Card, Badge, Loading, Empty, ErrorBox, Gauge, InfoBox } from "../components/ui.jsx";
+import {
+  Wrench, UploadCloud, Cpu, FileText, ShieldCheck, ExternalLink,
+  HeartPulse, Activity, Database,
+} from "lucide-react";
+import { Card, Badge, Loading, Empty, ErrorBox, InfoBox } from "../components/ui.jsx";
 import { useAnalysis } from "../useAnalysis.js";
 import { useVehicle } from "../VehicleContext.jsx";
 import { getModelMetrics } from "../api";
 import "./Dashboard.css";
 
 const SENSOR_FAULT = "LIKELY_SENSOR_FAULT";
+const RANGES = [300, 100];
 
 function fmt(value, digits = 1) {
   return typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "—";
@@ -35,8 +39,31 @@ function flagReasons(flags, sensor) {
   return reasons;
 }
 
+// Same thresholds the shared Gauge uses for its colour.
+function scoreTone(score) {
+  if (score >= 70) return "ok";
+  if (score >= 50) return "warn";
+  if (score >= 25) return "mod";
+  return "crit";
+}
+
 /* ------------------------------------------------------------------ */
-/* Upload call-to-action (demo mode only) — same workflow as before    */
+/* KPI card shell                                                      */
+/* ------------------------------------------------------------------ */
+function Kpi({ icon: Icon, label, children }) {
+  return (
+    <article className="dv2-kpi">
+      <div className="dv2-kpi-top">
+        <h2 className="dv2-kpi-label">{label}</h2>
+        <span className="dv2-kpi-icon" aria-hidden="true"><Icon size={16} /></span>
+      </div>
+      {children}
+    </article>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Upload call-to-action (demo mode only), same workflow as before     */
 /* ------------------------------------------------------------------ */
 function UploadCTA() {
   const { doUpload, uploading } = useVehicle();
@@ -53,13 +80,13 @@ function UploadCTA() {
   return (
     <Card
       title="Analyze Your Own Vehicle"
-      right={<UploadCloud size={13} color="var(--text-2)" />}
+      right={<UploadCloud size={14} color="var(--text-2)" aria-hidden="true" />}
       className="dv2-card dv2-upload"
     >
       <p className="dv2-copy">
         Everything on this dashboard is currently a synthetic demo scenario. Upload your own
-        telemetry CSV and this page — plus Vehicle Health, Anomaly Analysis, Sensor Analytics,
-        Digital Twin and Data Quality — will switch to show your vehicle's real numbers instead.
+        telemetry CSV and this page, plus Vehicle Health, Anomaly Analysis, Sensor Analytics,
+        Digital Twin and Data Quality, will switch to show your vehicle's real numbers instead.
       </p>
       <button
         type="button"
@@ -67,7 +94,7 @@ function UploadCTA() {
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
       >
-        <UploadCloud size={13} /> {uploading ? "Analyzing…" : "Upload CSV"}
+        <UploadCloud size={13} aria-hidden="true" /> {uploading ? "Analyzing…" : "Upload CSV"}
       </button>
       <input
         ref={fileRef}
@@ -81,7 +108,7 @@ function UploadCTA() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Model snapshot — live from /api/model-metrics                       */
+/* Model snapshot, live from /api/model-metrics                        */
 /* ------------------------------------------------------------------ */
 function ModelRow({ label, value, dataset }) {
   return (
@@ -128,7 +155,7 @@ function ModelSnapshot() {
   return (
     <Card
       title="Live Model Snapshot"
-      right={<Cpu size={13} color="var(--text-2)" />}
+      right={<Cpu size={14} color="var(--text-2)" aria-hidden="true" />}
       className="dv2-card dv2-models"
     >
       <div className="kv-list">
@@ -140,7 +167,7 @@ function ModelSnapshot() {
         <ModelRow
           label="RUL model"
           value={`${m.rul?.best_model ?? "—"} · MAE ${fmt(m.rul?.test_metrics?.test_mae, 1)} cycles`}
-          dataset="Trained on NASA C-MAPSS FD001 — aircraft turbofan engine data, not passenger-car data"
+          dataset="Trained on NASA C-MAPSS FD001, aircraft turbofan engine data, not passenger-car data"
         />
         <ModelRow
           label="Anomaly model"
@@ -179,7 +206,7 @@ function Limitations({ isUpload }) {
   return (
     <Card
       title="Data Limitations & Safety"
-      right={<ShieldCheck size={13} color="var(--text-2)" />}
+      right={<ShieldCheck size={14} color="var(--text-2)" aria-hidden="true" />}
       className="dv2-card dv2-limits"
     >
       <ul className="dv2-limit-list">
@@ -222,6 +249,7 @@ function Limitations({ isUpload }) {
 /* ------------------------------------------------------------------ */
 export default function Dashboard() {
   const { data, loading, error, vehicleId, isUpload } = useAnalysis();
+  const [range, setRange] = useState("all");
 
   const timeline = useMemo(() => {
     const scores = data?.anomaly?.timeline_scores;
@@ -233,6 +261,24 @@ export default function Dashboard() {
       t: Array.isArray(stamps) ? stamps[i] : undefined,
     }));
   }, [data]);
+
+  // Display window only: slices what is drawn, never the underlying values.
+  const rangeOptions = RANGES.filter(n => n < timeline.length);
+  const activeRange = rangeOptions.includes(range) ? range : "all";
+  const visible = useMemo(
+    () => (activeRange === "all" ? timeline : timeline.slice(-activeRange)),
+    [timeline, activeRange]
+  );
+  const stats = useMemo(() => {
+    if (!visible.length) return null;
+    let peak = visible[0];
+    let sum = 0;
+    for (const p of visible) {
+      if (p.v > peak.v) peak = p;
+      sum += p.v;
+    }
+    return { peak, mean: sum / visible.length };
+  }, [visible]);
 
   const health = data?.health;
   const an = data?.anomaly;
@@ -247,11 +293,11 @@ export default function Dashboard() {
     <div className={`page dv2${loading ? " dv2-busy" : ""}`} aria-busy={loading}>
       <header className="dv2-head">
         <div className="dv2-head-text">
-          <h2 className="dv2-title">Dashboard</h2>
+          <h1 className="dv2-title">Dashboard</h1>
           <p className="dv2-sub">
             {isUpload
-              ? <>Live pipeline output for your uploaded vehicle <span className="mono">{vehicleId}</span> — every figure below comes from the running anomaly, data-quality and health-scoring models.</>
-              : <>Live pipeline output for demo scenario <span className="mono">{vehicleId}</span> — every figure below comes from the running anomaly, data-quality and health-scoring models, not a static mock.</>}
+              ? <>Live pipeline output for your uploaded vehicle <span className="mono">{vehicleId}</span>. Every figure below comes from the running anomaly, data-quality and health-scoring models.</>
+              : <>Live pipeline output for demo scenario <span className="mono">{vehicleId}</span>. Every figure below comes from the running anomaly, data-quality and health-scoring models, not a static mock.</>}
           </p>
         </div>
         <div className="dv2-head-side">
@@ -260,7 +306,7 @@ export default function Dashboard() {
             {isUpload ? "Your uploaded telemetry" : "Synthetic demo telemetry"}
           </span>
           <Link className="btn btn-sm" to="/reports">
-            <FileText size={13} /> Reports
+            <FileText size={13} aria-hidden="true" /> Reports
           </Link>
         </div>
       </header>
@@ -272,26 +318,47 @@ export default function Dashboard() {
         <div className="dv2-body">
           <InfoBox>{data.source_disclaimer}</InfoBox>
 
-          <section className="grid grid-4 dv2-metrics" aria-label="Key metrics">
-            <Card title="Overall Health Score" className="dv2-card dv2-metric">
-              <Gauge value={health.health_score} band={health.band} />
-              <p className="dv2-cap dv2-cap-center">Documented weighted formula — see breakdown below.</p>
-            </Card>
-
-            <Card title="Anomaly Status" className="dv2-card dv2-metric">
-              <div className="card-hero">
-                <span className="value">{fmt(an.anomaly_ratio * 100, 0)}</span>
-                <span className="unit">% of window flagged</span>
+          <section className="dv2-metrics" aria-label="Key metrics">
+            <Kpi icon={HeartPulse} label="Vehicle health score">
+              <div className="dv2-kpi-value">
+                <span className="dv2-num">{fmt(health.health_score, 0)}</span>
+                <span className="dv2-unit">/ 100</span>
               </div>
-              <div className="dv2-badge-row"><Badge status={an.status} /></div>
-              <p className="dv2-cap">Model: {an.model_used}</p>
-            </Card>
-
-            <Card title="Sensor Reliability" className="dv2-card dv2-metric">
-              <div className="card-hero">
-                <span className="value dv2-value-sm">{sensorFlagged ? "Flagged" : "OK"}</span>
+              <div
+                className="dv2-meter"
+                role="meter"
+                aria-label="Health score"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(health.health_score)}
+              >
+                <span
+                  className={`dv2-meter-fill dv2-tone-${scoreTone(health.health_score)}`}
+                  style={{ width: `${Math.max(0, Math.min(100, health.health_score))}%` }}
+                />
               </div>
-              <div className="dv2-badge-row">
+              <div className="dv2-kpi-foot">
+                <Badge status={health.band} />
+                <span className="dv2-cap">Documented weighted formula, see breakdown below.</span>
+              </div>
+            </Kpi>
+
+            <Kpi icon={Activity} label="Window flagged">
+              <div className="dv2-kpi-value">
+                <span className="dv2-num">{fmt(an.anomaly_ratio * 100, 0)}</span>
+                <span className="dv2-unit">% of window</span>
+              </div>
+              <div className="dv2-kpi-foot">
+                <Badge status={an.status} />
+                <span className="dv2-cap">Model: {an.model_used}</span>
+              </div>
+            </Kpi>
+
+            <Kpi icon={ShieldCheck} label="Sensor integrity">
+              <div className="dv2-kpi-value">
+                <span className="dv2-num dv2-num-sm">{sensorFlagged ? "Flagged" : "OK"}</span>
+              </div>
+              <div className="dv2-kpi-foot">
                 <Badge status={sensorFlagged ? "WARNING" : "NORMAL"}>
                   {flaggedSensors.length ? flaggedSensors.join(", ") : "No sensor faults"}
                 </Badge>
@@ -310,20 +377,20 @@ export default function Dashboard() {
                 <p className="dv2-cap">Heuristic confidence {fmt(sf.confidence, 2)}</p>
               )}
               {typeof sf.note === "string" && <p className="dv2-cap">{sf.note}</p>}
-            </Card>
+            </Kpi>
 
-            <Card title="Data Quality" className="dv2-card dv2-metric">
-              <div className="card-hero">
-                <span className="value">{dq.data_quality_score}</span>
-                <span className="unit">/ 100</span>
+            <Kpi icon={Database} label="Data quality">
+              <div className="dv2-kpi-value">
+                <span className="dv2-num">{dq.data_quality_score}</span>
+                <span className="dv2-unit">/ 100</span>
               </div>
-              <p className="dv2-cap">
+              <p className="dv2-cap dv2-cap-flush">
                 {dq.n_rows} rows · {dq.duplicate_rows} duplicate · {dq.total_outliers} outliers
               </p>
               <p className="dv2-cap">
                 {fmt(dq.missing_pct, 2)}% missing · timestamps {dq.timestamp_monotonic ? "in order" : "out of order"}
               </p>
-            </Card>
+            </Kpi>
           </section>
 
           <section className="dv2-split" aria-label="Anomaly analysis">
@@ -336,73 +403,114 @@ export default function Dashboard() {
                 <Empty label="No timeline data in this analysis." />
               ) : (
                 <>
-                  <div className="dv2-chart">
-                    <ResponsiveContainer width="100%" height={240}>
-                      <AreaChart data={timeline} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
+                  {rangeOptions.length > 0 && (
+                    <div className="dv2-segmented" role="group" aria-label="Sample window shown in the chart">
+                      <button
+                        type="button"
+                        className={`dv2-seg${activeRange === "all" ? " is-active" : ""}`}
+                        aria-pressed={activeRange === "all"}
+                        onClick={() => setRange("all")}
+                      >
+                        All {timeline.length}
+                      </button>
+                      {rangeOptions.map(n => (
+                        <button
+                          type="button"
+                          key={n}
+                          className={`dv2-seg${activeRange === n ? " is-active" : ""}`}
+                          aria-pressed={activeRange === n}
+                          onClick={() => setRange(n)}
+                        >
+                          Last {n}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div
+                    className="dv2-chart"
+                    role="img"
+                    aria-label={`Anomaly intensity over ${visible.length} samples. Peak ${fmt(stats?.peak.v, 1)} at sample ${stats?.peak.i}; mean ${fmt(stats?.mean, 1)}.`}
+                  >
+                    <ResponsiveContainer width="100%" height={260}>
+                      <AreaChart data={visible} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
                         <defs>
                           <linearGradient id="dv2-timeline-fill" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" style={{ stopColor: "var(--accent)", stopOpacity: 0.28 }} />
+                            <stop offset="0%" style={{ stopColor: "var(--accent)", stopOpacity: 0.3 }} />
                             <stop offset="100%" style={{ stopColor: "var(--accent)", stopOpacity: 0.02 }} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="var(--line-soft)" vertical={false} />
                         <XAxis
                           dataKey="i"
-                          tick={{ fill: "var(--text-1)", fontSize: 10 }}
+                          tick={{ fill: "var(--text-1)", fontSize: 11 }}
                           tickLine={false}
                           axisLine={{ stroke: "var(--line)" }}
                           minTickGap={48}
                         />
                         <YAxis
-                          width={30}
+                          width={32}
                           domain={[0, 100]}
                           ticks={[0, 25, 50, 75, 100]}
-                          tick={{ fill: "var(--text-1)", fontSize: 10 }}
+                          tick={{ fill: "var(--text-1)", fontSize: 11 }}
                           tickLine={false}
                           axisLine={false}
                         />
                         <Tooltip
                           content={<TimelineTooltip />}
-                          cursor={{ stroke: "var(--accent)", strokeOpacity: 0.4 }}
+                          cursor={{ stroke: "var(--accent)", strokeOpacity: 0.45 }}
                         />
                         <Area
                           type="monotone"
                           dataKey="v"
                           stroke="var(--accent)"
-                          strokeWidth={1.6}
+                          strokeWidth={1.8}
                           fill="url(#dv2-timeline-fill)"
                           dot={false}
-                          activeDot={{ r: 3, fill: "var(--accent)", stroke: "var(--bg-0)" }}
+                          activeDot={{ r: 3.5, fill: "var(--accent)", stroke: "var(--bg-1)" }}
                           isAnimationActive={false}
                         />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
+
+                  {stats && (
+                    <dl className="dv2-stats">
+                      <div><dt>Peak</dt><dd>{fmt(stats.peak.v, 1)} <span>at sample {stats.peak.i}</span></dd></div>
+                      <div><dt>Mean</dt><dd>{fmt(stats.mean, 1)}</dd></div>
+                      <div><dt>Shown</dt><dd>{visible.length} <span>of {timeline.length}</span></dd></div>
+                    </dl>
+                  )}
+
                   <p className="dv2-cap">
-                    Relative intensity, scaled 0–100 within this window (x-axis: sample index). It is not
-                    an absolute fault level, so even a healthy window spans the full range.
+                    Relative intensity, scaled 0–100 within the analysed window (x-axis: sample index). It
+                    is not an absolute fault level, so even a healthy window spans the full range.
                   </p>
                 </>
               )}
             </Card>
 
             <Card title="Top Contributing Sensors" className="dv2-card dv2-contrib">
-              <div className="fault-list">
-                {(an.top_contributors || []).map(c => (
-                  <div className="fault-row" key={c.sensor}>
+              <ol className="fault-list dv2-rank">
+                {(an.top_contributors || []).map((c, idx) => (
+                  <li className="fault-row" key={c.sensor}>
+                    <span className="dv2-rank-n" aria-hidden="true">{idx + 1}</span>
                     <span className="mono dv2-contrib-name">{c.sensor}</span>
-                    <div className="bar-bg">
+                    <div className="bar-bg" aria-hidden="true">
                       <div className="bar-fill" style={{ width: `${Math.min(100, c.z_score * 40)}%` }} />
                     </div>
                     <span className="mono dv2-contrib-val">{c.z_score}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
-              <p className="dv2-cap">Mean absolute z-score of each sensor within the analysed window.</p>
+              </ol>
+              <p className="dv2-cap">
+                Mean absolute z-score of each sensor within the analysed window. These values show
+                which signals deviate most; they do not prove a component has failed.
+              </p>
             </Card>
           </section>
 
-          <section className="grid grid-2 dv2-split-even" aria-label="Health breakdown and maintenance">
+          <section className="dv2-split-even" aria-label="Health breakdown and maintenance">
             <Card title="Health Score Breakdown" className="dv2-card dv2-breakdown">
               <div className="kv-list">
                 <div className="kv-row">
@@ -430,7 +538,7 @@ export default function Dashboard() {
 
             <Card
               title="Maintenance Recommendations"
-              right={<Wrench size={13} color="var(--text-2)" />}
+              right={<Wrench size={14} color="var(--text-2)" aria-hidden="true" />}
               className="dv2-card dv2-maint"
             >
               {maintenance.length === 0 ? (
@@ -499,7 +607,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-2 dv2-bottom">
+      <div className="dv2-bottom">
         <ModelSnapshot />
         {!isUpload && !loading && <UploadCTA />}
       </div>
