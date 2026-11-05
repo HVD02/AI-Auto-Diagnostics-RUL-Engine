@@ -3,7 +3,7 @@ import { Routes, Route, NavLink, Link, Outlet, useLocation } from "react-router-
 import {
   Gauge as GaugeIcon, HeartPulse, Stethoscope, Radar, LineChart, TrendingDown,
   Brain, SlidersHorizontal, Wrench, Boxes, History as HistoryIcon,
-  BarChart3, ShieldCheck, FileText, Settings, Zap, FileUp, Menu, X,
+  BarChart3, ShieldCheck, FileText, Settings, FileUp, Menu, X, Activity, ArrowLeft,
 } from "lucide-react";
 import { VehicleProvider, useVehicle } from "./VehicleContext.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
@@ -26,20 +26,26 @@ import DataQuality from "./pages/DataQuality.jsx";
 import Reports from "./pages/Reports.jsx";
 import About from "./pages/About.jsx";
 
+// Single place to change the version label shown in the sidebar.
+// (package.json is intentionally NOT touched until the final release phase.)
+const APP_VERSION = "2.0.0";
+const DEFAULT_DOC_TITLE = "AI Auto-Diagnostics & RUL Engine";
+
+// Visual navigation groups. Route paths are unchanged from the existing app.
 const NAV = [
-  { group: "Overview", items: [
+  { group: "Command", items: [
     { to: "/dashboard", label: "Dashboard", icon: GaugeIcon },
     { to: "/health", label: "Vehicle Health", icon: HeartPulse },
     { to: "/twin", label: "Digital Twin", icon: Boxes },
   ]},
-  { group: "Diagnosis", items: [
+  { group: "Investigate", items: [
     { to: "/diagnostics", label: "Diagnostics", icon: Stethoscope },
     { to: "/anomaly", label: "Anomaly Analysis", icon: Radar },
     { to: "/sensors", label: "Sensor Analytics", icon: LineChart },
     { to: "/rul", label: "RUL & Prognostics", icon: TrendingDown },
     { to: "/xai", label: "Explainable AI", icon: Brain },
   ]},
-  { group: "Operations", items: [
+  { group: "Take action", items: [
     { to: "/whatif", label: "What-If Simulator", icon: SlidersHorizontal },
     { to: "/maintenance", label: "Maintenance Center", icon: Wrench },
     { to: "/reports", label: "Reports", icon: FileText },
@@ -52,13 +58,15 @@ const NAV = [
   ]},
 ];
 
-const PAGE_TITLES = {
-  "/dashboard": "Dashboard", "/health": "Vehicle Health", "/twin": "Vehicle Digital Twin",
-  "/diagnostics": "Diagnostics", "/anomaly": "Anomaly Analysis", "/sensors": "Sensor Analytics",
-  "/rul": "RUL & Prognostics", "/xai": "Explainable AI", "/whatif": "What-If Simulator",
-  "/maintenance": "Maintenance Center", "/reports": "Reports", "/history": "History",
-  "/models": "Model Analytics", "/quality": "Data Quality", "/about": "Settings / About",
-};
+// Resolves a pathname to { group, label } for the breadcrumb and document title.
+function resolveCrumb(path) {
+  for (const g of NAV) {
+    for (const item of g.items) {
+      if (item.to === path) return { group: g.group, label: item.label };
+    }
+  }
+  return { group: null, label: "Not found" };
+}
 
 // Tracks a CSS media query (used to know when the sidebar behaves as a drawer).
 function useMediaQuery(query) {
@@ -94,20 +102,23 @@ function Sidebar({ open, drawerOpen, onClose, closeRef }) {
       >
         <X size={16} aria-hidden="true" />
       </button>
+
       <Link
         to="/"
         className="sidebar-brand"
-        style={{ display: "block", textDecoration: "none", color: "inherit" }}
         title="Back to welcome screen"
         aria-label="AI Auto-Diagnostics, RUL Engine. Return to the welcome screen"
       >
-        <div className="logo-row">
-          <span className="logo-dot" />
-          <h1>AI AUTO-DIAGNOSTICS</h1>
-        </div>
-        <p>RUL ENGINE · v2.0.0</p>
+        <span className="brand-mark" aria-hidden="true">
+          <Activity size={19} strokeWidth={2.4} />
+        </span>
+        <span className="brand-text">
+          <span className="brand-name">AI AUTO-DIAGNOSTICS</span>
+          <span className="brand-sub">RUL ENGINE · v{APP_VERSION}</span>
+        </span>
       </Link>
-      <nav aria-label="Main navigation">
+
+      <nav className="sidebar-nav" aria-label="Main navigation">
         {NAV.map(g => (
           <div className="nav-group" key={g.group}>
             <div className="nav-group-label">{g.group}</div>
@@ -118,13 +129,27 @@ function Sidebar({ open, drawerOpen, onClose, closeRef }) {
                 end={item.to === "/"}
                 className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
               >
-                <item.icon size={15} aria-hidden="true" />
-                {item.label}
+                <span className="nav-ico" aria-hidden="true">
+                  <item.icon size={14} />
+                </span>
+                <span className="nav-text">{item.label}</span>
               </NavLink>
             ))}
           </div>
         ))}
       </nav>
+
+      <div className="sidebar-foot">
+        <strong>Decision support only</strong>
+        <p>
+          Research and education demonstration. Model outputs are diagnostic aids and do not
+          replace inspection by a qualified technician.
+        </p>
+        <Link to="/" className="btn btn-sm sidebar-foot-btn">
+          <ArrowLeft size={13} aria-hidden="true" />
+          Back to welcome
+        </Link>
+      </div>
     </aside>
   );
 }
@@ -133,9 +158,9 @@ function TopBar({ navOpen, onMenu, menuRef }) {
   const { vehicles, vehicleId, setVehicleId, dataSource, doUpload, uploading } = useVehicle();
   const fileRef = useRef(null);
   const location = useLocation();
-  // ignore a trailing slash so "/dashboard/" resolves the same title as "/dashboard"
+  // ignore a trailing slash so "/dashboard/" resolves the same crumb as "/dashboard"
   const path = location.pathname.replace(/\/+$/, "") || "/";
-  const title = PAGE_TITLES[path] || "Vehicle Diagnostic Console";
+  const crumb = resolveCrumb(path);
   const isUpload = dataSource?.mode === "upload";
 
   const onPick = (e) => {
@@ -144,8 +169,13 @@ function TopBar({ navOpen, onMenu, menuRef }) {
     e.target.value = "";
   };
 
+  const modeText = isUpload ? `Your upload · ${dataSource.filename}` : "Synthetic demo data";
+  const modeTitle = isUpload
+    ? `Analysing your uploaded CSV: ${dataSource.filename}`
+    : "Demo mode: synthetic telemetry, plus real research datasets where a page says so";
+
   return (
-    <div className="topbar">
+    <header className="topbar">
       <div className="topbar-lead">
         <button
           type="button"
@@ -158,31 +188,24 @@ function TopBar({ navOpen, onMenu, menuRef }) {
         >
           <Menu size={18} aria-hidden="true" />
         </button>
-        <div className="topbar-titles">
-          <div className="topbar-title">{title}</div>
-          <div className="topbar-sub">
-            {isUpload
-              ? `YOUR VEHICLE · ${dataSource.filename}`
-              : "DEMO MODE · SYNTHETIC + REAL RESEARCH DATASETS"}
-          </div>
-        </div>
-        <div className="topbar-tools">
-          <ThemeToggle />
-        </div>
+        <nav className="crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li className="crumb-root"><Link to="/dashboard">Workspace</Link></li>
+            {crumb.group && <li className="crumb-group">{crumb.group}</li>}
+            <li className="crumb-current" aria-current="page">{crumb.label}</li>
+          </ol>
+        </nav>
       </div>
-      <div className="topbar-actions">
-        <button
-          type="button"
-          className="btn btn-sm upload-btn"
-          onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          aria-label="Upload CSV"
+
+      <div className="topbar-controls">
+        <span
+          className={`mode-chip ${isUpload ? "is-upload" : "is-demo"}`}
+          role="status"
+          title={modeTitle}
         >
-          <FileUp size={13} aria-hidden="true" />
-          <span className="upload-label">{uploading ? "Uploading…" : "Upload CSV"}</span>
-        </button>
-        <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={onPick} />
-        <Zap size={13} color="var(--accent)" className="zap-icon" aria-hidden="true" />
+          <span className="mode-chip-text">{modeText}</span>
+        </span>
+
         <select
           className="vehicle-select"
           aria-label="Select demo scenario or uploaded vehicle"
@@ -198,8 +221,22 @@ function TopBar({ navOpen, onMenu, menuRef }) {
             </optgroup>
           )}
         </select>
+
+        <button
+          type="button"
+          className="btn btn-sm upload-btn"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          aria-label="Upload CSV"
+        >
+          <FileUp size={14} aria-hidden="true" />
+          <span className="upload-label">{uploading ? "Uploading…" : "Upload CSV"}</span>
+        </button>
+        <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={onPick} />
+
+        <ThemeToggle />
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -207,7 +244,7 @@ function UploadErrorBanner() {
   const { uploadError, setUploadError } = useVehicle();
   if (!uploadError) return null;
   return (
-    <div style={{ padding: "10px 22px 0" }}>
+    <div className="upload-error-wrap">
       <div className="disclaimer" role="alert" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <span>{uploadError.message || "Upload failed."}</span>
         <button className="btn btn-sm" onClick={() => setUploadError(null)} style={{ marginLeft: 12 }}>Dismiss</button>
@@ -228,6 +265,13 @@ function AppShell() {
   const mainColRef = useRef(null);
   const wasOpen = useRef(false);
 
+  // keep the browser tab title in step with the current page
+  useEffect(() => {
+    const clean = pathname.replace(/\/+$/, "") || "/";
+    document.title = `${resolveCrumb(clean).label} · ${DEFAULT_DOC_TITLE}`;
+    return () => { document.title = DEFAULT_DOC_TITLE; };
+  }, [pathname]);
+
   // close the drawer after any navigation, and when the screen becomes wide
   useEffect(() => { setNavOpen(false); }, [pathname]);
   useEffect(() => { if (!isNarrow) setNavOpen(false); }, [isNarrow]);
@@ -242,49 +286,49 @@ function AppShell() {
   }, [drawerOpen]);
 
   // Scroll lock, focus trap, and Escape to close the drawer.
-useEffect(() => {
-  if (!drawerOpen) return undefined;
+  useEffect(() => {
+    if (!drawerOpen) return undefined;
 
-  const previousOverflow = document.body.style.overflow;
-  document.body.style.overflow = "hidden";
-  closeRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
 
-  const onKeyDown = (event) => {
-    if (event.key === "Escape") {
-      setNavOpen(false);
-      return;
-    }
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setNavOpen(false);
+        return;
+      }
 
-    if (event.key !== "Tab") return;
+      if (event.key !== "Tab") return;
 
-    const sidebar = document.getElementById("app-sidebar");
-    if (!sidebar) return;
+      const sidebar = document.getElementById("app-sidebar");
+      if (!sidebar) return;
 
-    const focusable = sidebar.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    );
+      const focusable = sidebar.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
 
-    if (focusable.length === 0) return;
+      if (focusable.length === 0) return;
 
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
 
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  };
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
 
-  document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown);
 
-  return () => {
-    document.body.style.overflow = previousOverflow;
-    document.removeEventListener("keydown", onKeyDown);
-  };
-}, [drawerOpen]);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [drawerOpen]);
 
   // return focus to the menu button after the drawer closes
   useEffect(() => {
