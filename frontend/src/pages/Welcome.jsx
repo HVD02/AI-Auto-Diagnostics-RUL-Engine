@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Activity, ArrowRight, Brain, Database, FileUp, HeartPulse, Info,
+  Activity, ArrowDown, ArrowRight, ArrowUpRight, Brain, Database, HeartPulse, Info,
   LineChart, Radar, ShieldCheck, Stethoscope, TrendingDown, Wrench,
 } from "lucide-react";
 import { getHealth, getModelMetrics } from "../api";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import CarStage from "../components/CarStage.jsx";
 import "./Welcome.css";
 
-const TAGS = ["Vehicle health", "Sensor intelligence", "Fault analysis", "RUL prediction"];
+// Version label for the footer. Bump together with package.json at the final release.
+const APP_VERSION = "2.0.0";
+const REPO_URL = "https://github.com/HVD02/AI-Auto-Diagnostics-RUL-Engine";
+
+const TAGS = ["Anomaly intelligence", "Explainable diagnosis", "RUL prognostics"];
 
 const BACKEND_LABEL = {
   checking: "Checking backend…",
@@ -16,25 +21,19 @@ const BACKEND_LABEL = {
   offline: "Backend offline",
 };
 
+// Four workflow cards (prototype layout, statements taken from the README).
 const STEPS = [
-  {
-    n: "01 / INGEST", icon: FileUp, title: "Validate the signal",
-    text: "Upload a telemetry CSV or choose a synthetic demo scenario. Data-quality and sensor-plausibility checks run first, so unreliable inputs are flagged before anything is scored.",
-  },
-  {
-    n: "02 / DETECT", icon: Radar, title: "Spot unusual behaviour",
-    text: "A one-class anomaly model flags unusual windows and ranks the sensors that deviate most within the analysed window.",
-  },
-  {
-    n: "03 / EXPLAIN", icon: Brain, title: "Show the reasoning",
-    text: "Fault classification on EngineFaultDB comes with SHAP explanations that show which inputs drove a prediction.",
-  },
-  {
-    n: "04 / PLAN", icon: Wrench, title: "Plan the next check",
-    text: "A documented health-score formula, RUL estimates and maintenance checks retrieved from a real fault knowledge base. Retrieved, never generated.",
-  },
+  { n: "01 / VALIDATE", icon: ShieldCheck, tone: "lime", title: "Prepare the signal",
+    text: "Check schema, missing values, duplicates, timestamps and physical plausibility before analysis begins." },
+  { n: "02 / DETECT", icon: Radar, tone: "aqua", title: "Find the deviation",
+    text: "Compare sensor behaviour, surface anomalies and rank the signals that deserve a closer look." },
+  { n: "03 / EXPLAIN", icon: Brain, tone: "violet", title: "Show the reasoning",
+    text: "Bring fault classes, SHAP feature contributions and limitations into the same visual field." },
+  { n: "04 / PLAN", icon: Wrench, tone: "orange", title: "Prioritise the check",
+    text: "Explore prognostics and maintenance references without presenting a model estimate as certainty." },
 ];
 
+// Links into the real workspace pages (unchanged routes).
 const CAPS = [
   { to: "/health", icon: HeartPulse, title: "Vehicle health",
     text: "One score built from a disclosed additive formula, with every contribution shown rather than hidden." },
@@ -51,43 +50,52 @@ const CAPS = [
 ];
 
 const DATASETS = [
-  { name: "EngineFaultDB", tone: "ok", status: "Real data",
+  { name: "EngineFaultDB", role: "DIAGNOSIS", tone: "ok", status: "Real data",
     text: "Fault-diagnosis training and evaluation. Unnamed fault classes appear as Fault Class 1–3." },
-  { name: "NASA C-MAPSS FD001", tone: "ok", status: "Real data",
+  { name: "NASA C-MAPSS FD001", role: "PROGNOSTICS", tone: "ok", status: "Real data",
     text: "RUL methodology only. Aircraft turbofan engines, not passenger cars." },
-  { name: "Automotive Faults dataset", tone: "ok", status: "Real data",
-    text: "Maintenance knowledge retrieval over 99 documented entries. Entries are retrieved, not generated." },
-  { name: "Synthetic demo telemetry", tone: "warn", status: "Synthetic",
+  { name: "Automotive Faults dataset", role: "REFERENCE", tone: "ok", status: "Real data",
+    text: "Maintenance knowledge retrieval. Entries are retrieved, not generated, and are not a diagnosis." },
+  { name: "Synthetic demo telemetry", role: "DEMO MODE", tone: "warn", status: "Synthetic",
     text: "Powers the demo scenarios and the anomaly benchmark. Not real vehicle data." },
-  { name: "EngineAD", tone: "neutral", status: "Not included",
+  { name: "EngineAD", role: "RESEARCH REFERENCE", tone: "neutral", status: "Not included",
     text: "Real fleet data is access-gated by its authors, so it is not part of this build." },
+];
+
+// Methodology (compared models are documented in the README; "selected" comes live from the backend).
+const METHODS = [
+  { key: "anomaly", title: "Anomaly detection",
+    compared: "Isolation Forest · One-Class SVM · Local Outlier Factor",
+    data: "Synthetic demo telemetry, trained one-class on the healthy scenario." },
+  { key: "diagnosis", title: "Fault diagnosis",
+    compared: "Logistic Regression · Random Forest · SVM · XGBoost",
+    data: "EngineFaultDB, evaluated on a held-out test set." },
+  { key: "rul", title: "Remaining useful life",
+    compared: "Random Forest · Gradient Boosting · XGBoost regression",
+    data: "NASA C-MAPSS FD001 with an engine-level split. Aircraft turbofan data." },
 ];
 
 function fmt(value, digits = 2) {
   return typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "—";
 }
 
-// Builds tiles ONLY from fields /api/model-metrics already returns (the same
-// ones Dashboard.jsx reads). Dataset labels describe each model's data.
-function buildTiles(m) {
-  if (!m) return [];
-  const an = m.anomaly;
+// Benchmark items are built ONLY from fields /api/model-metrics already returns
+// (the same ones Dashboard.jsx reads). With no metrics, stable placeholders are shown.
+function buildBenchmarks(m) {
+  const an = m?.anomaly;
   const anomalyF1 = an?.model_comparison?.[an?.best_model]?.f1;
   return [
     {
-      key: "diagnosis", name: "Fault diagnosis", label: "macro-F1",
-      value: fmt(m.diagnosis?.test_metrics?.test_f1_macro), unit: "",
-      model: m.diagnosis?.best_model || "—", data: "EngineFaultDB · held-out test",
+      key: "anomaly", label: "F1", unit: "F1", value: fmt(anomalyF1),
+      caption: "Anomaly / synthetic demo telemetry", model: an?.best_model || "",
     },
     {
-      key: "rul", name: "RUL prediction", label: "MAE",
-      value: fmt(m.rul?.test_metrics?.test_mae, 1), unit: "cycles",
-      model: m.rul?.best_model || "—", data: "NASA C-MAPSS FD001 · aircraft turbofan, not passenger cars",
+      key: "diagnosis", label: "macro-F1", unit: "F1", value: fmt(m?.diagnosis?.test_metrics?.test_f1_macro),
+      caption: "Diagnosis / EngineFaultDB", model: m?.diagnosis?.best_model || "",
     },
     {
-      key: "anomaly", name: "Anomaly detection", label: "F1",
-      value: fmt(anomalyF1), unit: "",
-      model: an?.best_model || "—", data: "Synthetic demo telemetry",
+      key: "rul", label: "MAE", unit: "cycles", value: fmt(m?.rul?.test_metrics?.test_mae, 1),
+      caption: "RUL MAE / NASA C-MAPSS FD001", model: m?.rul?.best_model || "",
     },
   ];
 }
@@ -108,29 +116,40 @@ export default function Welcome() {
     return () => { cancelled = true; };
   }, []);
 
-  const tiles = buildTiles(metrics);
+  const benches = buildBenchmarks(metrics);
+  let benchHint = "Documented evaluation · dataset-specific";
+  if (!metrics && !metricsFailed) benchHint = "Loading model information…";
+  if (!metrics && metricsFailed) benchHint = "Model metrics are unavailable right now";
 
   return (
     <div className="lp">
-      <div className="lp-bg" aria-hidden="true" />
-
       <header className="lp-header">
-        <div className="lp-wrap lp-header-inner">
+        <div className="lp-header-inner">
           <Link to="/" className="lp-brand" aria-label="AI Auto-Diagnostics and RUL Engine, home">
-            <span className="lp-mark" aria-hidden="true"><Activity size={17} /></span>
+            <span className="lp-mark" aria-hidden="true"><Activity size={22} strokeWidth={2.4} /></span>
             <span className="lp-brand-text">
-              <span className="lp-brand-name">AI Auto-Diagnostics</span>
-              <span className="lp-brand-sub">Automotive intelligence</span>
+              <span className="lp-brand-name">AI AUTO-DIAGNOSTICS</span>
+              <span className="lp-brand-sub">RUL Engine / Intelligence studio</span>
             </span>
           </Link>
           <nav className="lp-nav" aria-label="Page sections">
+            <a href="#workflow">Platform</a>
             <a href="#capabilities">Capabilities</a>
-            <a href="#pipeline">Pipeline</a>
-            <a href="#data">Data &amp; limits</a>
+            <a href="#benchmarks">Model results</a>
+            <a href="#provenance">Data &amp; limits</a>
           </nav>
           <div className="lp-header-actions">
             <ThemeToggle />
-            <Link to="/dashboard" className="lp-btn lp-btn-primary lp-btn-sm">
+            <a
+              className="lp-btn lp-btn-outline lp-btn-sm lp-gh"
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub repository (opens in a new tab)"
+            >
+              GitHub <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+            <Link to="/dashboard" className="lp-btn lp-btn-lime lp-btn-sm">
               Workspace <ArrowRight size={15} aria-hidden="true" />
             </Link>
           </div>
@@ -139,186 +158,214 @@ export default function Welcome() {
 
       <main>
         <section className="lp-hero" aria-labelledby="lp-title">
-          <div className="lp-wrap lp-hero-grid">
+          <div className="lp-hero-grid">
             <div className="lp-hero-copy">
-              <div className="lp-eyebrow">
-                <span className="lp-eyebrow-dot" aria-hidden="true" />
-                Automotive intelligence platform
-              </div>
+              <div className="lp-eyebrow">Automotive intelligence / research edition</div>
               <h1 id="lp-title" className="lp-title">
-                Understand the signal. <span className="lp-accent">Anticipate the failure.</span>
+                Know what’s<br />happening <em>under</em><br />the hood.
               </h1>
               <p className="lp-lede">
-                Vehicle health, sensor anomalies, fault diagnosis and remaining useful life, brought
-                together in one transparent diagnostic workspace.
+                A diagnostic cockpit for vehicle telemetry. Spot unusual signals, investigate likely
+                faults, understand model behaviour and explore predictive-maintenance workflows, all
+                in one connected workspace.
               </p>
               <p className="lp-support">
-                Built to show what the models know, what the data supports, and where uncertainty
-                remains. Demo mode runs on synthetic telemetry, and you can upload your own CSV from
-                the workspace.
+                Demo mode runs on synthetic telemetry, and you can upload your own CSV from the
+                workspace.
               </p>
+              <p className="lp-note-line">DETECT THE PATTERN. EXPLAIN THE SIGNAL. PLAN THE NEXT CHECK.</p>
               <div className="lp-cta-row">
-                <Link to="/dashboard" className="lp-btn lp-btn-primary">
-                  Enter diagnostics <ArrowRight size={16} aria-hidden="true" />
+                <Link to="/dashboard" className="lp-btn lp-btn-lime">
+                  Enter the diagnostic cockpit <ArrowUpRight size={17} aria-hidden="true" />
                 </Link>
-                <a href="#pipeline" className="lp-btn lp-btn-ghost">See how it works</a>
+                <a href="#workflow" className="lp-btn lp-btn-outline">
+                  Explore the platform <ArrowDown size={16} aria-hidden="true" />
+                </a>
               </div>
-              <ul className="lp-tags" aria-label="Capabilities">
-                {TAGS.map(t => <li className="lp-tag" key={t}>{t}</li>)}
+              <ul className="lp-tags" aria-label="Highlights">
+                {TAGS.map(t => <li className="lp-tag" key={t}><b aria-hidden="true">✳</b>{t}</li>)}
               </ul>
             </div>
 
-            <aside className="lp-preview" aria-label="Pipeline status and model metrics">
-              <div className="lp-preview-head">
-                <span className="lp-preview-title">Pipeline status</span>
-                <span className={`lp-status lp-status-${backend}`} role="status" aria-live="polite">
-                  <span className="lp-status-dot" aria-hidden="true" />
-                  {BACKEND_LABEL[backend]}
-                </span>
-              </div>
-
-              {backend === "offline" && (
-                <p className="lp-offline">
-                  The backend is not reachable. Start it from the <code>backend</code> folder with{" "}
-                  <code>uvicorn main:app --reload</code>, then refresh this page.
-                </p>
-              )}
-
-              {tiles.length > 0 && (
-                <ul className="lp-tiles">
-                  {tiles.map(t => (
-                    <li className="lp-tile" key={t.key}>
-                      <span className="lp-tile-kicker">{t.name}</span>
-                      <span className="lp-tile-value">
-                        <span className="lp-tile-label">{t.label}</span>
-                        {t.value}
-                        {t.unit && <small>{t.unit}</small>}
-                      </span>
-                      <span className="lp-tile-model">{t.model}</span>
-                      <span className="lp-tile-data">{t.data}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {tiles.length === 0 && !metricsFailed && (
-                <p className="lp-muted">Loading model information…</p>
-              )}
-              {tiles.length === 0 && metricsFailed && backend !== "offline" && (
-                <p className="lp-muted">Model metrics are unavailable right now.</p>
-              )}
-
-              <figure className="lp-signal">
-                <svg viewBox="0 0 400 80" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                  <path className="lp-signal-base" d="M0 40 H400" />
-                  <path
-                    className="lp-signal-line"
-                    pathLength="1"
-                    d="M0 44 L24 41 L44 46 L66 38 L88 43 L108 36 L124 20 L138 62 L154 30 L172 45 L196 40 L220 47 L242 35 L262 42 L284 38 L304 14 L318 66 L334 34 L358 43 L378 39 L400 42"
-                  />
-                </svg>
-                <figcaption>Illustrative signal graphic · not live data</figcaption>
-              </figure>
-
-              <div className="lp-note">
-                <Info size={14} aria-hidden="true" />
-                <span>
-                  Metrics are the evaluation figures stored with the trained models. They describe
-                  each model on its own dataset, not on your vehicle.
-                </span>
-              </div>
-            </aside>
-          </div>
-        </section>
-
-        <section className="lp-section" id="capabilities" aria-labelledby="lp-caps-title">
-          <div className="lp-wrap">
-            <div className="lp-section-head">
-              <div className="lp-eyebrow"><span className="lp-eyebrow-dot" aria-hidden="true" />What you can do</div>
-              <h2 id="lp-caps-title">Six views, one connected workflow.</h2>
-              <p>Each card opens the real page in the workspace.</p>
-            </div>
-            <ul className="lp-caps">
-              {CAPS.map(c => (
-                <li key={c.to}>
-                  <Link to={c.to} className="lp-cap">
-                    <span className="lp-cap-icon" aria-hidden="true"><c.icon size={18} /></span>
-                    <h3>{c.title}</h3>
-                    <p>{c.text}</p>
-                    <span className="lp-cap-link">Open <ArrowRight size={13} aria-hidden="true" /></span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section className="lp-section lp-section-alt" id="pipeline" aria-labelledby="lp-pipe-title">
-          <div className="lp-wrap">
-            <div className="lp-section-head">
-              <div className="lp-eyebrow"><span className="lp-eyebrow-dot" aria-hidden="true" />The pipeline</div>
-              <h2 id="lp-pipe-title">From raw signal to reasoned action.</h2>
-              <p>The important result comes first. Evidence, context and next steps sit one click away.</p>
-            </div>
-            <ol className="lp-steps">
-              {STEPS.map(s => (
-                <li className="lp-step" key={s.n}>
-                  <span className="lp-step-n">{s.n}</span>
-                  <span className="lp-cap-icon" aria-hidden="true"><s.icon size={18} /></span>
-                  <h3>{s.title}</h3>
-                  <p>{s.text}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className="lp-section" id="data" aria-labelledby="lp-data-title">
-          <div className="lp-wrap lp-honest">
-            <div>
-              <div className="lp-eyebrow"><span className="lp-eyebrow-dot" aria-hidden="true" />Trust is a feature</div>
-              <h2 id="lp-data-title">Useful AI is honest about its limits.</h2>
-              <p className="lp-honest-copy">
-                Every model here is tied to the dataset it was trained and evaluated on. Provenance and
-                limitations are part of the interface, not buried in a footer.
+            <div className="lp-stage">
+              <CarStage />
+              <p className="lp-stage-caption">
+                Illustrative scan graphic. Sample labels on the stage are not live backend results.
               </p>
-              <div className="lp-callout" role="note">
-                <ShieldCheck size={18} aria-hidden="true" />
-                <div>
-                  <strong>Important:</strong> Remaining useful life is trained on NASA C-MAPSS aircraft
-                  turbofan data. It demonstrates a prognostics method and is not a passenger-car RUL
-                  model. Anomaly figures are measured on synthetic telemetry. This is a diagnostic aid
-                  for demonstration and education, not a replacement for a certified technician.
+            </div>
+          </div>
+          <div className="lp-scroll" aria-hidden="true">
+            <span><i className="lp-scroll-line" />Scroll to inspect the system</span>
+            <span>01 / 04 — SIGNAL TO SERVICE</span>
+          </div>
+        </section>
+
+        <section className="lp-bench" id="benchmarks" aria-labelledby="lp-bench-title">
+          <div className="lp-bench-inner">
+            <div className="lp-bench-intro">
+              <h2 id="lp-bench-title">MODEL BENCHMARKS</h2>
+              <span>{benchHint}</span>
+              <span className={`lp-status lp-status-${backend}`} role="status" aria-live="polite">
+                <span className="lp-status-dot" aria-hidden="true" />
+                {BACKEND_LABEL[backend]}
+              </span>
+            </div>
+            {benches.map(b => (
+              <div className="lp-bench-item" key={b.key}>
+                <strong>
+                  {b.value}
+                  {b.value !== "—" && <em> {b.unit}</em>}
+                </strong>
+                <small>{b.caption}</small>
+                {b.model && <span className="lp-bench-model">{b.model}</span>}
+              </div>
+            ))}
+          </div>
+          {backend === "offline" && (
+            <p className="lp-offline">
+              The backend is not reachable. Start it from the <code>backend</code> folder with{" "}
+              <code>uvicorn main:app --reload</code>, then refresh this page.
+            </p>
+          )}
+          <p className="lp-bench-note">
+            <Info size={13} aria-hidden="true" />
+            <span>
+              Figures are the evaluation metrics stored with the trained models. They describe each
+              model on its own dataset, not your vehicle.
+            </span>
+          </p>
+        </section>
+
+        <section className="lp-section" id="workflow" aria-labelledby="lp-flow-title">
+          <div className="lp-section-head">
+            <div>
+              <div className="lp-eyebrow">From data to decision support</div>
+              <h2 id="lp-flow-title">Four moves.<br />One diagnostic story.</h2>
+            </div>
+            <p>
+              Put the evidence first. Give every model output a clear context, then make the next
+              inspection step easy to understand.
+            </p>
+          </div>
+          <ol className="lp-flow">
+            {STEPS.map(s => (
+              <li className={`lp-card lp-flow-card lp-tone-${s.tone}`} key={s.n}>
+                <div className="lp-flow-top">
+                  <span>{s.n}</span>
+                  <span className="lp-icon" aria-hidden="true"><s.icon size={19} /></span>
                 </div>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="lp-section lp-section-tight" id="capabilities" aria-labelledby="lp-caps-title">
+          <div className="lp-section-head">
+            <div>
+              <div className="lp-eyebrow">The workspace</div>
+              <h2 id="lp-caps-title">Six views, one connected workflow.</h2>
+            </div>
+            <p>Each card opens the real page in the workspace.</p>
+          </div>
+          <ul className="lp-caps">
+            {CAPS.map(c => (
+              <li key={c.to}>
+                <Link to={c.to} className="lp-card lp-cap">
+                  <span className="lp-icon lp-tone-lime" aria-hidden="true"><c.icon size={18} /></span>
+                  <h3>{c.title}</h3>
+                  <p>{c.text}</p>
+                  <span className="lp-cap-link">Open <ArrowRight size={13} aria-hidden="true" /></span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="lp-section lp-section-tight" id="provenance" aria-labelledby="lp-data-title">
+          <div className="lp-split">
+            <div className="lp-split-copy">
+              <div className="lp-eyebrow">Research transparency / built in</div>
+              <h2 id="lp-data-title">Good AI makes its boundaries visible.</h2>
+              <p>
+                The interface distinguishes synthetic demo telemetry, supported automotive fault
+                samples and aircraft-engine prognostics. That clarity is part of the product, not a
+                footnote.
+              </p>
+              <div className="lp-caution" role="note">
+                <b>Important RUL context:</b> NASA C-MAPSS FD001 contains aircraft turbofan data. It
+                demonstrates the prognostics workflow; it is not a passenger-car remaining-life
+                model. Anomaly figures are measured on synthetic telemetry.
               </div>
             </div>
             <ul className="lp-data-list">
               {DATASETS.map(d => (
                 <li className="lp-data-row" key={d.name}>
-                  <span className="lp-cap-icon" aria-hidden="true"><Database size={17} /></span>
+                  <span className="lp-icon" aria-hidden="true"><Database size={17} /></span>
                   <span className="lp-data-text">
-                    <span className="lp-data-name">
-                      {d.name}
-                      <span className={`lp-chip lp-chip-${d.tone}`}>{d.status}</span>
-                    </span>
-                    <span className="lp-data-desc">{d.text}</span>
+                    <strong>{d.name}</strong>
+                    <small>{d.text}</small>
+                  </span>
+                  <span className="lp-data-side">
+                    <span className="lp-data-role">{d.role}</span>
+                    <span className={`lp-chip lp-chip-${d.tone}`}>{d.status}</span>
                   </span>
                 </li>
               ))}
             </ul>
           </div>
         </section>
+
+        <section className="lp-section lp-section-tight" aria-labelledby="lp-method-title">
+          <div className="lp-section-head">
+            <div>
+              <div className="lp-eyebrow">Methodology</div>
+              <h2 id="lp-method-title">How each model was chosen.</h2>
+            </div>
+            <p>
+              Every module benchmarks several approaches on its own dataset. The selected model is
+              read from the backend.
+            </p>
+          </div>
+          <ul className="lp-method">
+            {METHODS.map(x => {
+              const selected = metrics?.[x.key]?.best_model;
+              return (
+                <li className="lp-card lp-method-card" key={x.key}>
+                  <h3>{x.title}</h3>
+                  <dl>
+                    <div><dt>Compared</dt><dd>{x.compared}</dd></div>
+                    <div><dt>Selected</dt><dd className="mono">{selected || "—"}</dd></div>
+                    <div><dt>Data</dt><dd>{x.data}</dd></div>
+                  </dl>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="lp-safety" role="note">
+            <ShieldCheck size={18} aria-hidden="true" />
+            <p>
+              <strong>Responsible use.</strong> This system is an educational and research
+              demonstration. It is a diagnostic aid and does not replace inspection by a qualified
+              automotive technician. Do not use it as the sole basis for a safety-critical
+              maintenance decision.
+            </p>
+          </div>
+        </section>
       </main>
 
       <footer className="lp-footer">
-        <div className="lp-wrap lp-footer-inner">
+        <div className="lp-footer-inner">
           <p>
-            AI Auto-Diagnostics &amp; RUL Engine · v2.0.0 · A decision-support aid for research and
-            education. Do not use it as the sole basis for a safety-critical maintenance decision.
+            AI AUTO-DIAGNOSTICS &amp; RUL ENGINE · v{APP_VERSION}
+            <span> Decision support for research and education · Not a replacement for certified inspection</span>
           </p>
           <nav aria-label="Footer">
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/models">Model Analytics</Link>
             <Link to="/about">Settings / About</Link>
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
           </nav>
         </div>
       </footer>
