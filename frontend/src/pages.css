@@ -6,16 +6,21 @@
    logic or markup depends on this file.
    ============================================================ */
 
-/* ---------- page header ---------- */
-.page-header h2 {
-  font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+/* ---------- page header (Dashboard has its own header, so excluded) ---------- */
+.page:not(.dv2) .page-header { margin-bottom: 20px; }
+.page:not(.dv2) .page-header h2 {
+  margin: 0 0 6px;
+  font-size: clamp(1.55rem, 1.2rem + 1.1vw, 2.05rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--text-0);
 }
 .page-header p {
   max-width: 78ch;
   line-height: 1.6;
-  font-size: 13px;
+  font-size: 13.5px;
+  color: var(--text-1);
 }
 
 /* gentle entrance (opacity only, so it never creates a containing block) */
@@ -26,17 +31,18 @@
 
 /* ---------- cards ---------- */
 .page .card { min-width: 0; }
-.page:not(.dv2) .card { padding: 18px; }
+.page:not(.dv2) .card { padding: 20px; border-radius: var(--radius-lg); }
 .page:not(.dv2) .card-title {
   margin: 0 0 14px;
+  font-family: var(--sans);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.005em;
   text-transform: none;
   color: var(--text-0);
 }
 .page .grid > * { min-width: 0; }
-.page .card-hero .value { letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.page .card-hero .value { letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 
 /* ---------- key/value rows and ranked rows ---------- */
 .page:not(.dv2) .kv-row { gap: 12px; padding: 8px 0; }
@@ -53,7 +59,7 @@
 .page .data-table tbody tr:last-child td { border-bottom: 0; }
 
 /* ---------- buttons and pills ---------- */
-.page .btn { min-height: 34px; }
+.page .btn { min-height: 36px; }
 .page .btn-sm { min-height: 30px; }
 .page a.btn { text-decoration: none; }
 .page .pill-row .btn { min-height: 32px; }
@@ -64,14 +70,14 @@
 .page input:not([type="range"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]) {
   min-height: 36px;
   max-width: 100%;
-  padding: 7px 10px;
+  padding: 7px 11px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
   background: var(--bg-2);
   color: var(--text-0);
   font-family: inherit;
   font-size: var(--fs-sm);
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 .page textarea { min-height: 84px; line-height: 1.55; }
 .page select:hover,
@@ -79,7 +85,10 @@
 .page input:not([type="range"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):hover { border-color: var(--border-strong); }
 .page select:focus-visible,
 .page textarea:focus-visible,
-.page input:focus-visible { border-color: var(--accent); }
+.page input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
 .page select option { background: var(--bg-1); color: var(--text-0); }
 .page input::placeholder,
 .page textarea::placeholder { color: var(--text-2); opacity: 1; }
@@ -94,7 +103,7 @@
 /* ---------- twin cells, upload zone ---------- */
 .page .twin-cell { transition: border-color 0.2s ease, transform 0.2s var(--ease); }
 .page .twin-cell:hover { border-color: rgba(var(--accent-rgb), 0.45); }
-.page .upload-drop { border-radius: var(--radius); }
+.page .upload-drop { border-radius: var(--radius-lg); }
 
 /* ---------- charts (every page) ---------- */
 .page .recharts-wrapper { max-width: 100%; }
@@ -119,7 +128,7 @@
 
 /* ---------- small screens ---------- */
 @media (max-width: 680px) {
-  .page:not(.dv2) .card { padding: 14px; }
+  .page:not(.dv2) .card { padding: 14px; border-radius: var(--radius); }
   .page .data-table th,
   .page .data-table td { padding: 8px 8px; }
   .page .page-header { margin-bottom: 14px; }
