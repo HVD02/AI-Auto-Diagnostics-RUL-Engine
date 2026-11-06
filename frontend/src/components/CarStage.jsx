@@ -32,9 +32,14 @@ const CSS = `
   --cs-aqua: #66e8d0;
   --cs-ink: #101219;
   --cs-muted: #a7adbb;
+  /* Fill the parent. All children are absolutely positioned or percentage-sized, so without an
+     explicit width this box shrink-wraps to ~0px inside a flex column (align-items: center)
+     and the stage, its SVG and the labels collapse to nothing. */
+  width: 100%;
+  max-width: 100%;
+  container: cs / inline-size;
   position: relative;
   isolation: isolate;
-  min-height: 485px;
   display: grid;
   place-items: center;
   animation: cs-rise 0.85s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -185,13 +190,11 @@ html[data-theme="light"] .cs-chip {
   .cs, .cs-scan, .cs-dot, .cs-live::before { animation: none; }
 }
 
-/* ---- responsive (same breakpoints as the prototype) ---- */
+/* ---- responsive (viewport breakpoints from the prototype; fallback for old browsers) ---- */
 @media (max-width: 850px) {
-  .cs { min-height: 420px; }
   .cs-stage { width: min(100%, 620px); }
 }
 @media (max-width: 620px) {
-  .cs { min-height: 330px; }
   .cs-stage { width: 100%; aspect-ratio: 1.08 / 1; border-radius: 22px; }
   .cs-chip { min-width: 105px; padding: 9px 10px; }
   .cs-chip strong { font-size: 17px; }
@@ -209,6 +212,33 @@ html[data-theme="light"] .cs-chip {
 @media (max-width: 440px) {
   .cs-label { display: none; }
   .cs-id { max-width: 48%; }
+}
+
+/* compact stage: follows the width of the stage itself, not the viewport,
+   so it also works in the 850-1120px two-column hero layout */
+@container cs (max-width: 500px) {
+  .cs-chip { min-width: 108px; padding: 9px 11px; border-radius: 12px; }
+  .cs-chip strong { font-size: 17px; }
+  .cs-chip small { font-size: 9px; }
+  .cs-chip .cs-unit { font-size: 10px; }
+  .cs-chip .cs-note { font-size: 10px; }
+  .cs-chip-c { min-width: 96px; }
+  .cs-label { display: none; }
+  .cs-top, .cs-bottom { left: 14px; right: 14px; }
+  .cs-top { top: 13px; }
+  .cs-bottom { bottom: 12px; font-size: 8.5px; }
+  .cs-bottom span:first-child { display: none; }
+  .cs-bottom span:last-child { margin-left: auto; }
+  .cs-id { max-width: 50%; }
+}
+@container cs (max-width: 400px) {
+  .cs-chip { min-width: 84px; padding: 7px 9px; }
+  .cs-chip strong { font-size: 15px; margin-top: 2px; }
+  .cs-chip small { font-size: 8px; letter-spacing: 0.06em; }
+  .cs-chip .cs-note { display: none; }
+  .cs-chip-a { top: 28%; left: -6px; }
+  .cs-chip-b { bottom: 20%; right: -6px; }
+  .cs-chip-c { top: 22%; right: 8px; min-width: 78px; }
 }
 `;
 
