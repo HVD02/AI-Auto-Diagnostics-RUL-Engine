@@ -1,8 +1,154 @@
 /* ============================================================
    DiagnosisPages.css: Diagnostics, Explainable AI, What-If.
-   Prefixes: dgx- (shared), wi- (What-If). Tokens from theme.css only.
+   Prefixes: dgx- (shared by the three modules), dx- (Diagnostics),
+   wi- (What-If). Tokens from theme.css only, so dark and light
+   themes both stay readable. The "legacy" section at the bottom
+   keeps the Explainable AI and What-If pages working until they
+   are redesigned in Phases 7B and 7C.
    ============================================================ */
 
+/* ---------- shared: page frame ---------- */
+.dgx-page { min-width: 0; }
+.dgx-page :where(h1, h2, h3, p, ul, ol, dl, dd) { margin: 0; }
+.dgx-page :where(ul, ol) { padding: 0; list-style: none; }
+.dgx-page > * + * { margin-top: 14px; }
+.dgx-page > .dgx-head { margin-top: 0; }
+.dgx-page .mono { font-family: var(--mono); }
+
+/* ---------- shared: header ---------- */
+.dgx-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; flex-wrap: wrap; }
+.dgx-head-text { flex: 1 1 380px; min-width: 0; max-width: 760px; }
+.dgx-eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--accent-text);
+}
+.dgx-eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; }
+.dgx-title {
+  margin-top: 10px !important;
+  font-size: clamp(30px, 3.6vw, 44px); font-weight: 800; line-height: 1.02; letter-spacing: -0.05em; color: var(--text-0);
+}
+.dgx-sub { margin-top: 10px; max-width: 70ch; font-size: 13.5px; line-height: 1.65; color: var(--text-1); }
+.dgx-head-side { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 0 1 auto; }
+.dgx-head-side .btn { min-height: 36px; }
+.dgx-source {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 13px;
+  border: 1px solid color-mix(in srgb, var(--aqua) 38%, transparent); border-radius: 999px;
+  background: color-mix(in srgb, var(--aqua) 10%, transparent); color: var(--aqua-text);
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.dgx-source-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 9px currentColor; }
+
+/* ---------- shared: workflow strip ---------- */
+.dgx-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.dgx-step {
+  position: relative; display: flex; align-items: center; gap: 11px; min-width: 0; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--bg-1); box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, background 0.2s;
+}
+.dgx-step:not(:last-child)::after {
+  content: ""; position: absolute; top: 50%; right: -11px; width: 10px; height: 1px; background: var(--border-strong);
+}
+.dgx-step-ico {
+  width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center; border-radius: 10px;
+  background: var(--bg-2); color: var(--text-2);
+}
+.dgx-step-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.dgx-step-n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text-2); }
+.dgx-step-detail { font-size: 12.5px; font-weight: 600; color: var(--text-1); overflow-wrap: anywhere; }
+.dgx-step.is-active { border-color: rgba(var(--accent-rgb), 0.5); background: color-mix(in srgb, var(--accent) 7%, var(--bg-1)); }
+.dgx-step.is-active .dgx-step-ico { background: rgba(var(--accent-rgb), 0.16); color: var(--accent-text); }
+.dgx-step.is-active .dgx-step-detail { color: var(--text-0); }
+.dgx-step.is-done .dgx-step-ico { background: rgba(var(--accent-rgb), 0.14); color: var(--accent-text); }
+.dgx-step.is-done .dgx-step-detail { color: var(--text-0); }
+.dgx-step.is-error { border-color: var(--crit-border); background: var(--crit-dim); }
+.dgx-step.is-error .dgx-step-ico { background: var(--crit-dim); color: var(--crit); }
+.dgx-step.is-error .dgx-step-detail { color: var(--crit); }
+@media (prefers-reduced-motion: no-preference) {
+  .dgx-step.is-active .dgx-step-ico { animation: dgx-breathe 1.8s ease-in-out infinite; }
+}
+@keyframes dgx-breathe { 50% { box-shadow: 0 0 0 5px rgba(var(--accent-rgb), 0.1); } }
+
+/* ---------- shared: panel ---------- */
+.dgx-panel {
+  position: relative; min-width: 0; padding: 18px;
+  border: 1px solid var(--line); border-radius: 18px; background: var(--bg-1); box-shadow: var(--shadow-sm);
+}
+.dgx-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.dgx-panel-head h2 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-0); }
+.dgx-panel-head p { margin-top: 4px; font-size: 12px; color: var(--text-2); }
+.dgx-tint-ok { background: color-mix(in srgb, var(--ok) 8%, var(--bg-1)); border-color: var(--ok-border); }
+.dgx-tint-warn { background: color-mix(in srgb, var(--warn) 9%, var(--bg-1)); border-color: var(--warn-border); }
+.dgx-tint-mod { background: color-mix(in srgb, var(--mod) 9%, var(--bg-1)); border-color: var(--mod-border); }
+.dgx-tint-crit { background: color-mix(in srgb, var(--crit) 9%, var(--bg-1)); border-color: var(--crit-border); }
+
+.dgx-error { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.dgx-error > :first-child { flex: 1 1 320px; }
+
+.dgx-page .fault-row { padding: 10px 12px; border-radius: 10px; }
+.dgx-page .fault-row .bar-bg { height: 7px; }
+
+/* ---------- Diagnostics ---------- */
+.dx-results { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.dx-results.is-busy { opacity: 0.55; pointer-events: none; transition: opacity 0.2s; }
+@media (prefers-reduced-motion: no-preference) {
+  .dx-results { animation: dx-in 0.4s var(--ease) both; }
+}
+@keyframes dx-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.dx-row { display: grid; gap: 14px; align-items: stretch; min-width: 0; }
+.dx-row-a { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
+.dx-row-b, .dx-row-c { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+.dx-label {
+  margin-bottom: 12px; font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.3rem); font-weight: 800;
+  letter-spacing: -0.045em; line-height: 1.05; color: var(--text-0); overflow-wrap: anywhere;
+}
+.dx-meter { margin-top: 18px; }
+.dx-meter-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--text-2); }
+.dx-meter-head b { font-size: 12px; font-weight: 600; letter-spacing: 0; color: var(--text-0); }
+.dx-meter-track { height: 8px; border-radius: 999px; background: var(--bg-3); overflow: hidden; }
+.dx-meter-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-strong), var(--accent)); transition: width 0.5s ease; }
+.dx-facts { display: grid; gap: 8px; margin-top: 16px; }
+.dx-facts > div { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-0); }
+.dx-facts dt { font-size: 12px; color: var(--text-2); }
+.dx-facts dd { font-size: 12.5px; font-weight: 600; color: var(--text-0); text-align: right; overflow-wrap: anywhere; }
+
+.dx-notes { display: grid; gap: 10px; }
+.dx-notes li { position: relative; padding-left: 16px; font-size: 13px; line-height: 1.65; color: var(--text-1); }
+.dx-notes li::before { content: ""; position: absolute; left: 0; top: 0.7em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.dx-notes b { color: var(--text-0); }
+
+.dx-checks { display: grid; gap: 8px; }
+.dx-checks li { display: flex; flex-direction: column; gap: 3px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-2); }
+.dx-checks strong { font-size: 13px; color: var(--text-0); }
+.dx-checks span { font-size: 12px; line-height: 1.55; color: var(--text-1); }
+.dx-checks .dx-sep { color: var(--orange); }
+
+.dx-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.dx-input { min-width: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-0); }
+.dx-input dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--text-2); overflow-wrap: anywhere; }
+.dx-input dd { margin-top: 3px; font-family: var(--mono); font-size: 13.5px; font-weight: 600; color: var(--text-0); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1100px) {
+  .dgx-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dgx-step:nth-child(2)::after { display: none; }
+  .dx-row-a, .dx-row-b, .dx-row-c { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 620px) {
+  .dgx-head { align-items: flex-start; }
+  .dgx-head-side { width: 100%; }
+  .dgx-head-side .btn { flex: 1 1 auto; justify-content: center; }
+  .dgx-steps { grid-template-columns: minmax(0, 1fr); }
+  .dgx-step::after { display: none; }
+  .dgx-panel { padding: 14px; border-radius: 16px; }
+  .dx-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ============================================================
+   Legacy rules still used by Explainable AI and What-If.
+   (Unchanged from the previous version; replaced in 7B / 7C.)
+   ============================================================ */
 .dgx-toolbar { margin-bottom: 14px; }
 .dgx-note { margin-bottom: 14px; }
 .dgx-stack { display: flex; flex-direction: column; gap: 14px; }
