@@ -1,10 +1,9 @@
 /* ============================================================
    DiagnosisPages.css: Diagnostics, Explainable AI, What-If.
    Prefixes: dgx- (shared by the three modules), dx- (Diagnostics),
-   wi- (What-If). Tokens from theme.css only, so dark and light
-   themes both stay readable. The "legacy" section at the bottom
-   keeps the Explainable AI and What-If pages working until they
-   are redesigned in Phases 7B and 7C.
+   xa- (Explainable AI), wi- (What-If). Tokens from theme.css only,
+   so dark and light themes both stay readable. The "legacy" section
+   keeps the What-If page working until it is redesigned in 7C.
    ============================================================ */
 
 /* ---------- shared: page frame ---------- */
@@ -146,8 +145,8 @@
 }
 
 /* ============================================================
-   Legacy rules still used by Explainable AI and What-If.
-   (Unchanged from the previous version; replaced in 7B / 7C.)
+   Legacy rules still used by What-If (redesigned in Phase 7C),
+   and shared helpers used by Diagnostics / Explainable AI.
    ============================================================ */
 .dgx-toolbar { margin-bottom: 14px; }
 .dgx-note { margin-bottom: 14px; }
@@ -217,3 +216,85 @@
 
 .wi-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--text-1); }
 .wi-hint { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--text-1); }
+
+/* ============================================================
+   Explainable AI (Phase 7B): prefix xa-
+   ============================================================ */
+.dgx-chip-label {
+  padding: 3px 8px; border: 1px solid var(--line); border-radius: 7px; white-space: nowrap;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-2);
+}
+.xa-row-a { display: grid; gap: 14px; align-items: stretch; min-width: 0; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); }
+.xa-context .dx-label { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); }
+
+.xa-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; font-size: 12px; color: var(--text-1); }
+.xa-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.xa-sw { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.xa-pos { background: var(--crit); }
+.xa-neg { background: var(--ok); }
+
+/* diverging chart: label | bar area centred on zero | exact value */
+.xa-axis, .xa-bar-row { display: grid; grid-template-columns: minmax(84px, 0.7fr) minmax(0, 2fr) minmax(64px, auto); gap: 12px; align-items: center; }
+.xa-axis { margin-bottom: 4px; }
+.xa-axis-scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--text-2); }
+.xa-axis-scale b { font-weight: 500; }
+.xa-bars { display: grid; gap: 6px; }
+.xa-bar-row { padding: 7px 10px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--bg-2); }
+.xa-name { min-width: 0; font-size: 12.5px; color: var(--text-0); overflow-wrap: anywhere; }
+.xa-track { position: relative; height: 14px; border-radius: 4px; background: var(--bg-3); }
+.xa-track::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--border-strong); }
+.xa-fill { position: absolute; top: 0; bottom: 0; border-radius: 3px; min-width: 2px; transition: width 0.45s ease; }
+.xa-fill.xa-pos { background: linear-gradient(90deg, color-mix(in srgb, var(--crit) 60%, transparent), var(--crit)); }
+.xa-fill.xa-neg { background: linear-gradient(270deg, color-mix(in srgb, var(--ok) 60%, transparent), var(--ok)); }
+.xa-num { min-width: 0; text-align: right; font-size: 12.5px; font-weight: 600; color: var(--text-0); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ranking */
+.xa-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.xa-stats > div { min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-0); }
+.xa-stats dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); }
+.xa-stats dd { margin-top: 5px; font-size: 13px; font-weight: 700; color: var(--text-0); overflow-wrap: anywhere; }
+.xa-rank { display: grid; gap: 6px; }
+.xa-rank-row {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(40px, 1fr) auto; gap: 12px; align-items: center;
+  padding: 9px 12px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--bg-2);
+}
+.xa-rank-n { font-size: 11px; color: var(--text-2); }
+.xa-rank-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.xa-rank-name { font-size: 12.5px; font-weight: 600; color: var(--text-0); overflow-wrap: anywhere; }
+.xa-dir { align-self: flex-start; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-1); }
+.xa-dir-pos { color: var(--crit); border-color: var(--crit-border); background: var(--crit-dim); }
+.xa-dir-neg { color: var(--ok); border-color: var(--ok-border); background: var(--ok-dim); }
+.xa-rank-bar { height: 7px; border-radius: 5px; background: var(--bg-3); overflow: hidden; }
+.xa-rank-bar i { display: block; height: 100%; border-radius: inherit; }
+.xa-rank-val { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+.xa-rank-val b { font-size: 12.5px; color: var(--text-0); font-variant-numeric: tabular-nums; }
+.xa-rank-val small { font-size: 10.5px; color: var(--text-2); }
+
+.xa-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.xa-links .btn { text-decoration: none; }
+
+/* model F1 by class + feature chips */
+.xa-f1 { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.xa-f1 ul { display: grid; gap: 6px; margin-top: 10px; }
+.xa-f1 li { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(40px, 1fr) 40px; gap: 10px; align-items: center; font-size: 12.5px; color: var(--text-1); }
+.xa-f1 li.is-predicted { color: var(--text-0); font-weight: 600; }
+.xa-f1 li em { font-style: normal; font-weight: 500; color: var(--accent-text); }
+.xa-f1-track { height: 6px; border-radius: 4px; background: var(--bg-3); overflow: hidden; }
+.xa-f1-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--violet), var(--accent)); }
+.xa-f1 b { text-align: right; color: var(--text-0); }
+.xa-chip { font-family: var(--mono); }
+.xa-chip.is-used { color: var(--accent-text); border-color: rgba(var(--accent-rgb), 0.5); background: var(--accent-dim); }
+
+@media (max-width: 1100px) {
+  .xa-row-a { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 620px) {
+  .xa-axis { display: none; }
+  .xa-bar-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; }
+  .xa-bar-row .xa-name { grid-column: 1 / -1; }
+  .xa-stats { grid-template-columns: minmax(0, 1fr); }
+  .xa-rank-row { grid-template-columns: 20px minmax(0, 1fr) auto; row-gap: 8px; }
+  .xa-rank-bar { grid-column: 1 / -1; order: 5; }
+  .xa-f1 li { grid-template-columns: minmax(0, 1fr) 40px; }
+  .xa-f1-track { grid-column: 1 / -1; order: 5; }
+}
