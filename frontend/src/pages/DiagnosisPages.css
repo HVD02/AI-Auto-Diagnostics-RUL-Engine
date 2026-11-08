@@ -2,8 +2,7 @@
    DiagnosisPages.css: Diagnostics, Explainable AI, What-If.
    Prefixes: dgx- (shared by the three modules), dx- (Diagnostics),
    xa- (Explainable AI), wi- (What-If). Tokens from theme.css only,
-   so dark and light themes both stay readable. The "legacy" section
-   keeps the What-If page working until it is redesigned in 7C.
+   so dark and light themes both stay readable.
    ============================================================ */
 
 /* ---------- shared: page frame ---------- */
@@ -145,8 +144,8 @@
 }
 
 /* ============================================================
-   Legacy rules still used by What-If (redesigned in Phase 7C),
-   and shared helpers used by Diagnostics / Explainable AI.
+   Shared helpers used by Diagnostics, Explainable AI and What-If
+   (some started life as What-If rules).
    ============================================================ */
 .dgx-toolbar { margin-bottom: 14px; }
 .dgx-note { margin-bottom: 14px; }
@@ -185,37 +184,108 @@
 .dgx-callout { margin: 0; font-size: clamp(1rem, 0.95rem + 0.4vw, 1.2rem); line-height: 1.55; color: var(--text-0); }
 .dgx-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* ---------- What-If ---------- */
-.wi-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 14px; align-items: start; }
-.wi-results { display: flex; flex-direction: column; gap: 14px; min-width: 0; position: sticky; top: 76px; }
-@media (max-width: 1100px) {
-  .wi-layout { grid-template-columns: minmax(0, 1fr); }
-  .wi-results { position: static; }
+/* ---------- What-If (Phase 7C): prefix wi- ---------- */
+.wi-row-a { display: grid; gap: 14px; align-items: start; min-width: 0; grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.5fr); }
+.wi-tag {
+  display: inline-block; margin-bottom: 10px; padding: 2px 8px; border-radius: 6px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
 }
+.wi-tag-base { background: color-mix(in srgb, var(--violet) 14%, transparent); color: var(--violet-text); }
+.wi-tag-sim { background: rgba(var(--accent-rgb), 0.14); color: var(--accent-text); }
 
-.wi-sliders { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2px 24px; }
-.wi-sliders .slider-row { margin-bottom: 12px; }
-.wi-sliders .slider-head label { font-size: 12.5px; }
-.wi-sliders label.is-active { color: var(--accent-text); font-weight: 600; }
+/* toolbar */
+.wi-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.wi-toolbar .btn-primary { min-height: 40px; padding: 0 18px; font-size: 13px; }
+.wi-live { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; font-size: 12.5px; color: var(--text-1); cursor: pointer; }
+.wi-live input { width: 16px; height: 16px; accent-color: var(--accent); }
+.wi-presets { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.wi-presets-label { margin-right: 4px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--text-2); }
+.wi-status { margin: 12px 0 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-0); font-size: 12.5px; line-height: 1.5; color: var(--text-1); }
 
-/* visible track in both themes + filled portion; thumb styled for Chromium and Firefox */
-.wi-sliders input[type="range"] {
-  -webkit-appearance: none; appearance: none;
-  height: 6px; border-radius: 999px; outline-offset: 6px;
+/* sliders */
+.wi-controls { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.wi-ctl { min-width: 0; padding: 11px 13px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-2); transition: border-color 0.2s, background 0.2s; }
+.wi-ctl.is-changed { border-color: rgba(var(--accent-rgb), 0.55); background: color-mix(in srgb, var(--accent) 6%, var(--bg-2)); }
+.wi-ctl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.wi-ctl-head label { font-size: 12.5px; font-weight: 600; color: var(--text-0); overflow-wrap: anywhere; }
+.wi-ctl-head label.is-active { color: var(--accent-text); }
+.wi-ctl-val { font-size: 13.5px; font-weight: 700; color: var(--text-0); font-variant-numeric: tabular-nums; }
+.wi-range { position: relative; margin: 10px 0 4px; }
+.wi-range input[type="range"] {
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 6px; margin: 0;
+  border-radius: 999px; outline-offset: 6px; cursor: pointer;
   background: linear-gradient(to right, var(--accent) var(--p, 0%), var(--border-strong) var(--p, 0%));
 }
-.wi-sliders input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+.wi-range input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--bg-1); box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
 }
-.wi-sliders input[type="range"]::-moz-range-thumb {
-  width: 12px; height: 12px; border-radius: 50%;
+.wi-range input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--bg-1); box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
 }
-.wi-sliders input[type="range"]::-moz-range-track { background: transparent; }
+.wi-range input[type="range"]::-moz-range-track { background: transparent; }
+.wi-tick { position: absolute; left: var(--b, 0%); top: 50%; width: 2px; height: 14px; transform: translate(-50%, -50%); border-radius: 1px; background: var(--text-1); opacity: 0.75; pointer-events: none; }
+.wi-ctl-foot { display: flex; justify-content: space-between; gap: 6px; font-size: 10px; color: var(--text-2); }
+.wi-ctl-base { color: var(--text-1); }
+.wi-ctl-changed { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.wi-chip-changed { padding: 1px 8px; border-radius: 999px; background: var(--accent-dim); color: var(--accent-text); font-family: var(--mono); font-size: 10.5px; font-weight: 600; }
+.wi-link { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px; border: 0; background: none; cursor: pointer; font-size: 11.5px; font-weight: 600; color: var(--text-1); }
+.wi-link:hover { color: var(--accent-text); }
+.wi-ctl-note { margin-top: 6px; font-size: 11px; color: var(--warn); }
 
-.wi-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--text-1); }
+/* comparison */
+.wi-compare { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.wi-compare.is-busy { opacity: 0.55; pointer-events: none; transition: opacity 0.2s; }
+.wi-verdict { padding: 3px 9px; border-radius: 7px; border: 1px solid var(--line); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; white-space: nowrap; color: var(--text-1); }
+.wi-verdict.is-changed { color: var(--orange); border-color: var(--mod-border); background: var(--mod-dim); }
+.wi-verdict.is-same { color: var(--aqua-text); border-color: color-mix(in srgb, var(--aqua) 40%, transparent); background: color-mix(in srgb, var(--aqua) 10%, transparent); }
+.wi-stale { margin: 0 0 12px; padding: 8px 12px; border: 1px solid var(--warn-border); border-radius: 10px; background: var(--warn-dim); color: var(--warn); }
+.wi-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.wi-side { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-0); }
+.wi-side.is-sim { border-color: rgba(var(--accent-rgb), 0.45); background: color-mix(in srgb, var(--accent) 5%, var(--bg-0)); }
+.wi-side-label { margin-bottom: 10px; font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.08; color: var(--text-0); overflow-wrap: anywhere; }
+.wi-conf { height: 6px; margin-top: 12px; border-radius: 999px; background: var(--bg-3); overflow: hidden; }
+.wi-conf i { display: block; height: 100%; border-radius: inherit; background: var(--violet); }
+.wi-side.is-sim .wi-conf i { background: linear-gradient(90deg, var(--accent-strong), var(--accent)); }
+.wi-side-model { margin-top: 10px; font-size: 11.5px; color: var(--text-2); }
+.wi-deltas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.wi-deltas > div { min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-0); }
+.wi-deltas dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); }
+.wi-deltas dd { margin-top: 5px; font-size: 13px; font-weight: 700; color: var(--text-0); overflow-wrap: anywhere; }
+
+.wi-classes { display: grid; gap: 12px; }
+.wi-class-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; font-size: 12.5px; color: var(--text-0); }
+.wi-class-head b { font-size: 11.5px; color: var(--text-1); }
+.wi-class-bar { position: relative; display: flex; align-items: center; gap: 8px; height: 14px; margin-bottom: 3px; }
+.wi-class-bar i { display: block; height: 6px; min-width: 2px; border-radius: 4px; }
+.wi-class-bar em { font-style: normal; font-size: 10.5px; color: var(--text-1); white-space: nowrap; }
+.wi-b { background: var(--violet); }
+.wi-s { background: var(--accent); }
+.wi-key { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--text-1); }
+.wi-key span { display: inline-flex; align-items: center; gap: 6px; }
+.wi-sw { width: 10px; height: 10px; border-radius: 3px; }
+
+.wi-inputs { display: grid; gap: 6px; }
+.wi-inputs li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 9px 12px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--bg-2); }
+.wi-in-name { font-size: 12.5px; font-weight: 600; color: var(--text-0); overflow-wrap: anywhere; }
+.wi-in-vals { font-size: 12px; color: var(--text-1); text-align: right; white-space: nowrap; }
+.wi-in-d { grid-column: 1 / -1; font-size: 11.5px; color: var(--accent-text); }
 .wi-hint { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--text-1); }
+
+@media (max-width: 1100px) {
+  .wi-row-a { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 620px) {
+  .wi-pair { grid-template-columns: minmax(0, 1fr); }
+  .wi-deltas { grid-template-columns: minmax(0, 1fr); }
+  .wi-controls { grid-template-columns: minmax(0, 1fr); }
+  .wi-toolbar .btn-primary { flex: 1 1 100%; justify-content: center; }
+  .wi-live { margin-left: 0; }
+  .wi-range input[type="range"]::-webkit-slider-thumb { width: 24px; height: 24px; }
+  .wi-range input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; }
+  .wi-range input[type="range"] { height: 8px; }
+}
 
 /* ============================================================
    Explainable AI (Phase 7B): prefix xa-
