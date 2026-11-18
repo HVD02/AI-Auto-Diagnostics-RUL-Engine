@@ -1,5 +1,12 @@
 import React from "react";
 
+/* ============================================================
+   Shared building blocks for the Diagnostics, Explainable AI and
+   What-If pages. TopFaults and ShapBars are UNCHANGED (same props,
+   same markup). ModuleHeader, Pipeline and Panel are new and are
+   reused by all three pages.
+   ============================================================ */
+
 // Ranked class probabilities (Diagnostics, What-If).
 export function TopFaults({ items }) {
   return (
@@ -65,5 +72,66 @@ export function ShapBars({ items, legend = false }) {
         </>
       )}
     </>
+  );
+}
+
+// Page header used by the three modules: eyebrow, title, description, and a right-hand action area.
+export function ModuleHeader({ eyebrow, title, children, source, actions }) {
+  return (
+    <header className="dgx-head">
+      <div className="dgx-head-text">
+        <div className="dgx-eyebrow">{eyebrow}</div>
+        <h1 className="dgx-title">{title}</h1>
+        <div className="dgx-sub">{children}</div>
+      </div>
+      {(source || actions) && (
+        <div className="dgx-head-side">
+          {source}
+          {actions}
+        </div>
+      )}
+    </header>
+  );
+}
+
+const STATE_WORD = { idle: "waiting", active: "in progress", done: "complete", error: "failed" };
+
+// Workflow strip. steps: [{ key, label, icon, state: idle|active|done|error, detail }]
+export function Pipeline({ steps, label }) {
+  return (
+    <ol className="dgx-steps" aria-label={label}>
+      {steps.map((s, i) => (
+        <li
+          key={s.key}
+          className={`dgx-step is-${s.state}`}
+          aria-current={s.state === "active" ? "step" : undefined}
+        >
+          <span className="dgx-step-ico" aria-hidden="true">{s.icon ? <s.icon size={16} /> : null}</span>
+          <span className="dgx-step-text">
+            <span className="dgx-step-n">{String(i + 1).padStart(2, "0")} / {s.label}</span>
+            <span className="dgx-step-detail">{s.detail}</span>
+          </span>
+          <span className="dgx-sr">{` (${STATE_WORD[s.state] || s.state})`}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+// Premium panel: title, optional sub-title and right-hand slot.
+export function Panel({ title, sub, right, className = "", label, children }) {
+  return (
+    <section className={`dgx-panel ${className}`.trim()} aria-label={label || title}>
+      {title && (
+        <div className="dgx-panel-head">
+          <div>
+            <h2>{title}</h2>
+            {sub && <p>{sub}</p>}
+          </div>
+          {right}
+        </div>
+      )}
+      {children}
+    </section>
   );
 }

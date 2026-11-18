@@ -1,6 +1,11 @@
 /* ============================================================
    theme.css: central design tokens for dark and light themes.
-   Existing variable names are preserved so every page keeps working.
+   Palette follows the Studio Concept prototype:
+     dark  = charcoal ink + lime / aqua / violet / orange / pink
+     light = warm paper + deep olive accent (lime is a FILL only)
+   All pre-existing variable names are preserved so every page
+   keeps working. New tokens (--lime, --aqua, --violet, --orange,
+   --pink, --*-text, --on-lime, --mod-border) are additive.
    The theme is set by  <html data-theme="dark|light">  (index.html
    inline script + ThemeContext.jsx).
    ============================================================ */
@@ -22,6 +27,10 @@
   --fs-lg: 18px;
   --fs-xl: 22px;
   --fs-kpi: 32px;
+
+  /* brand colours as FILLS (identical in both themes; always pair with --on-lime) */
+  --lime: #d6ff4f;
+  --on-lime: #15191e;
 }
 
 /* ---------- DARK (default) ---------- */
@@ -29,91 +38,115 @@
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg-0: #080d10;
-  --bg-soft: #0c1317;
-  --bg-1: #111a1f;
-  --bg-2: #162228;
-  --bg-3: #1d2c33;
-  --line: rgba(173, 204, 211, 0.13);
-  --line-soft: rgba(173, 204, 211, 0.08);
-  --border-strong: rgba(173, 204, 211, 0.23);
+  /* charcoal ink surfaces */
+  --bg-0: #101219;
+  --bg-soft: #131620;
+  --bg-1: #161a24;
+  --bg-2: #1d2230;
+  --bg-3: #282e40;
+  --line: rgba(255, 255, 255, 0.105);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.2);
 
-  --text-0: #eef5f6;
-  --text-1: #c0cdd1;
-  --text-2: #87999f;
+  /* text (all pass AA on --bg-0 / --bg-1) */
+  --text-0: #f7f8fb;
+  --text-1: #c7ccd8;
+  --text-2: #a1a6b5;
 
-  --accent: #38d6df;
-  --accent-strong: #12b9c7;
-  --accent-text: #38d6df;
-  --accent-rgb: 56, 214, 223;
-  --accent-dim: #16505a;
-  --accent-glow: rgba(56, 214, 223, 0.16);
-  --on-accent: #04181c;
-  --focus-ring: #38d6df;
+  /* primary accent = lime */
+  --accent: #d6ff4f;
+  --accent-strong: #c3f02f;
+  --accent-text: #d6ff4f;
+  --accent-rgb: 214, 255, 79;
+  --accent-dim: #2a3314;
+  --accent-glow: rgba(214, 255, 79, 0.16);
+  --on-accent: #15191e;
+  --focus-ring: #d6ff4f;
 
-  --ok: #4be0ad;   --ok-dim: #0f2f26;
-  --warn: #f4bb4f; --warn-dim: #33280e;
-  --mod: #fb923c;  --mod-dim: #36200e;
-  --crit: #ff777c; --crit-dim: #381518;
-  --info: #60a5fa; --info-dim: #12263f;
-  --ok-border: rgba(75, 224, 173, 0.3);
-  --warn-border: rgba(244, 187, 79, 0.3);
-  --crit-border: rgba(255, 119, 124, 0.3);
-  --info-border: rgba(96, 165, 250, 0.3);
+  /* secondary brand colours (usable as text on dark) */
+  --aqua: #66e8d0;
+  --aqua-text: #66e8d0;
+  --violet: #a98bff;
+  --violet-text: #a98bff;
+  --orange: #ff865b;
+  --pink: #ff5fb4;
 
-  --surface-glass: rgba(12, 19, 23, 0.85);
-  --grid: rgba(147, 186, 194, 0.045);
-  --shadow: 0 26px 80px rgba(0, 0, 0, 0.27);
-  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  /* semantic status */
+  --ok: #7ee7a6;   --ok-dim: #14291f;
+  --warn: #ffe17a; --warn-dim: #2e2a12;
+  --mod: #ff865b;  --mod-dim: #36210f;
+  --crit: #ff6e78; --crit-dim: #381820;
+  --info: #8fa3ff; --info-dim: #1b2243;
+  --ok-border: rgba(126, 231, 166, 0.3);
+  --warn-border: rgba(255, 225, 122, 0.3);
+  --mod-border: rgba(255, 134, 91, 0.3);
+  --crit-border: rgba(255, 110, 120, 0.32);
+  --info-border: rgba(143, 163, 255, 0.32);
+
+  --surface-glass: rgba(22, 26, 36, 0.86);
+  --grid: rgba(255, 255, 255, 0.04);
+  --shadow: 0 30px 100px rgba(0, 0, 0, 0.35);
+  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
   /* per-sensor chart colours */
-  --chart-1: #f87171; --chart-2: #60a5fa; --chart-3: #fbbf24; --chart-4: #34d399; --chart-5: #fb923c;
-  --chart-6: #a78bfa; --chart-7: #2dd4e8; --chart-8: #f472b6; --chart-9: #facc15; --chart-10: #4ade80;
+  --chart-1: #ff6e78; --chart-2: #748cff; --chart-3: #ffe17a; --chart-4: #7ee7a6; --chart-5: #ff865b;
+  --chart-6: #a98bff; --chart-7: #66e8d0; --chart-8: #ff5fb4; --chart-9: #d6ff4f; --chart-10: #9bf0b8;
 }
 
-/* ---------- LIGHT ---------- */
+/* ---------- LIGHT (warm paper) ----------
+   Lime/aqua are unreadable on cream, so in light mode:
+   --accent / --accent-text are a deep olive (>= 4.8:1 on every surface),
+   and bright lime survives only as --lime (button/fill) with dark --on-lime text. */
 html[data-theme="light"] {
   color-scheme: light;
 
-  --bg-0: #f4f8f8;
-  --bg-soft: #edf3f3;
-  --bg-1: #ffffff;
-  --bg-2: #f1f7f7;
-  --bg-3: #e3eded;
-  --line: rgba(28, 55, 63, 0.14);
-  --line-soft: rgba(28, 55, 63, 0.08);
-  --border-strong: rgba(28, 55, 63, 0.24);
+  --bg-0: #f5f1e8;
+  --bg-soft: #efeadf;
+  --bg-1: #fffdf8;
+  --bg-2: #f3eee4;
+  --bg-3: #e7e1d4;
+  --line: rgba(20, 25, 35, 0.14);
+  --line-soft: rgba(20, 25, 35, 0.08);
+  --border-strong: rgba(20, 25, 35, 0.26);
 
-  --text-0: #13262d;
-  --text-1: #40555d;
-  --text-2: #5b7077;
+  --text-0: #151923;
+  --text-1: #3f4655;
+  --text-2: #596071;
 
-  --accent: #007f8b;
-  --accent-strong: #006b75;
-  --accent-text: #006b75;
-  --accent-rgb: 0, 127, 139;
-  --accent-dim: #dff1f2;
-  --accent-glow: rgba(0, 127, 139, 0.1);
+  --accent: #5d7d00;
+  --accent-strong: #4a6400;
+  --accent-text: #4a6400;
+  --accent-rgb: 93, 125, 0;
+  --accent-dim: #e9efcc;
+  --accent-glow: rgba(93, 125, 0, 0.12);
   --on-accent: #ffffff;
-  --focus-ring: #006b75;
+  --focus-ring: #4a6400;
 
-  --ok: #067250;   --ok-dim: #def3ea;
-  --warn: #8a5a00; --warn-dim: #fbefd3;
-  --mod: #a14308;  --mod-dim: #fbe5d0;
-  --crit: #b7313d; --crit-dim: #f9dfe1;
-  --info: #1d5fb8; --info-dim: #e1ecfa;
-  --ok-border: rgba(6, 114, 80, 0.3);
-  --warn-border: rgba(138, 90, 0, 0.3);
-  --crit-border: rgba(183, 49, 61, 0.3);
-  --info-border: rgba(29, 95, 184, 0.3);
+  --aqua: #00806e;
+  --aqua-text: #00695a;
+  --violet: #6a45d0;
+  --violet-text: #5a38b8;
+  --orange: #b0410f;
+  --pink: #b82a78;
 
-  --surface-glass: rgba(255, 255, 255, 0.85);
-  --grid: rgba(28, 55, 63, 0.05);
-  --shadow: 0 22px 60px rgba(29, 63, 69, 0.09);
-  --shadow-sm: 0 1px 2px rgba(19, 38, 45, 0.06), 0 4px 14px rgba(19, 38, 45, 0.05);
+  --ok: #0b7a4b;   --ok-dim: #dff1e3;
+  --warn: #8a6400; --warn-dim: #f8ecc4;
+  --mod: #b0410f;  --mod-dim: #fbe3d3;
+  --crit: #bd2f3c; --crit-dim: #f9dcdd;
+  --info: #3550c4; --info-dim: #e3e8fb;
+  --ok-border: rgba(11, 122, 75, 0.32);
+  --warn-border: rgba(138, 100, 0, 0.34);
+  --mod-border: rgba(176, 65, 15, 0.32);
+  --crit-border: rgba(189, 47, 60, 0.32);
+  --info-border: rgba(53, 80, 196, 0.32);
 
-  --chart-1: #c8323f; --chart-2: #1d6fd1; --chart-3: #a06a00; --chart-4: #0a8a5f; --chart-5: #c2570c;
-  --chart-6: #7c4fd6; --chart-7: #00899a; --chart-8: #c2306f; --chart-9: #8a7400; --chart-10: #2f8f3a;
+  --surface-glass: rgba(255, 253, 248, 0.88);
+  --grid: rgba(20, 25, 35, 0.05);
+  --shadow: 0 22px 70px rgba(25, 35, 45, 0.12);
+  --shadow-sm: 0 1px 2px rgba(21, 25, 35, 0.06), 0 4px 14px rgba(21, 25, 35, 0.05);
+
+  --chart-1: #c8323f; --chart-2: #3550c4; --chart-3: #9a6a00; --chart-4: #0b7a4b; --chart-5: #c2570c;
+  --chart-6: #7c4fd6; --chart-7: #00806e; --chart-8: #c2306f; --chart-9: #6d7f00; --chart-10: #2f8f3a;
 }
 
 /* ============================================================
