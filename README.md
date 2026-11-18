@@ -7,6 +7,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?logo=vercel&logoColor=white)](https://ai-auto-diagnostics.vercel.app/)
 [![Backend API](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)](https://ai-auto-diagnostics-backend.onrender.com/docs)
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-646CFF?logo=vite&logoColor=white)](https://ai-auto-diagnostics.vercel.app/)
+[![Version](https://img.shields.io/badge/Version-3.0.0-9ACD32)](#)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-See%20repository-lightgrey)](#)
 
@@ -17,60 +18,115 @@
 
 ## Overview
 
-AI Auto-Diagnostics & RUL Engine is a full-stack automotive intelligence platform that brings several data-driven diagnostics and predictive-maintenance workflows into one interface. It combines data-quality checks, sensor anomaly analysis, fault diagnosis, vehicle-health scoring, Remaining Useful Life (RUL) prognostics, explainable AI (SHAP), and knowledge-based maintenance recommendations.
+AI Auto-Diagnostics & RUL Engine is a full-stack automotive intelligence platform that brings multiple data-driven diagnostics and predictive-maintenance workflows together in one integrated interface.
 
-The platform is designed to act like an **“AI doctor for a vehicle”**: it helps surface unusual sensor behaviour, investigate probable faults, understand model outputs, and explore maintenance priorities.
+It combines data-quality validation, sensor anomaly analysis, fault diagnosis, vehicle-health scoring, Remaining Useful Life (RUL) prognostics, explainable AI (SHAP), and knowledge-based maintenance recommendations.
 
-The project integrates multiple datasets, models, and analysis methods while documenting the boundaries of each dataset. It does **not** treat aircraft-engine data as passenger-car data, or synthetic demo telemetry as real fleet data.
+The platform is designed to act like an **AI doctor for a vehicle**: it helps surface unusual sensor behaviour, investigate probable faults, understand model outputs, and explore maintenance priorities.
+
+The project integrates multiple datasets, models, and analysis methods while documenting the boundaries of each dataset. It does **not** treat aircraft-engine data as passenger-car data or synthetic demo telemetry as real fleet data.
+
+## What's New in V3.0.0
+
+Version 3.0.0 introduces a comprehensive frontend redesign focused on usability, visual consistency, and a more integrated diagnostic experience.
+
+- Redesigned landing page and automotive-themed visual identity.
+- Updated workspace navigation and application layout.
+- Redesigned Command Centre dashboard.
+- Improved Vehicle Health and Digital Twin interfaces.
+- Redesigned Diagnostics and Explainable AI modules.
+- Improved What-If Simulator experience.
+- Redesigned Anomaly Analysis and Sensor Analytics.
+- Updated RUL & Prognostics interface.
+- Redesigned Maintenance Center, Reports, and History.
+- Improved Model Analytics and Data Quality pages.
+- Refined dark and light themes.
+- Improved responsive layouts and shared UI components.
+- Retained the existing FastAPI backend, API contracts, and machine-learning workflows.
+
+---
 
 ## Live Demo
 
-Open the deployed application:
-
 **[Launch AI Auto-Diagnostics & RUL Engine](https://ai-auto-diagnostics.vercel.app/)**
 
-The frontend is hosted on Vercel and the FastAPI backend is hosted on Render. On the free backend tier, the service may spin down after inactivity, so the first request after a quiet period can take longer than usual.
+The frontend is hosted on Vercel and the FastAPI backend is hosted on Render.
+
+On the free backend tier, the service may spin down after inactivity, so the first request after a quiet period can take longer than usual.
+
+---
 
 ## Screenshots
 
-### Welcome page — dark theme
-![Welcome page in dark theme](docs/screenshots/01-welcome-dark.jpg)
+### 01. Welcome Page — Dark Theme
 
-### Welcome page — light theme
-![Welcome page in light theme](docs/screenshots/02-welcome-light.jpg)
+![V3 Welcome Page Dark Theme](docs/screenshots/01-welcome-dark.jpg)
 
-### Dashboard — synthetic demo telemetry
-![Dashboard showing synthetic demo telemetry](docs/screenshots/03-dashboard-demo-mode.jpg)
+### 02. Welcome Page — Light Theme
 
-### Dashboard — uploaded telemetry
-![Dashboard showing uploaded telemetry analysis](docs/screenshots/04-dashboard-uploaded-telemetry.jpg)
+![V3 Welcome Page Light Theme](docs/screenshots/02-welcome-light.jpg)
 
-### Reports — generated PDF reports
-![Reports page showing generated PDF reports](docs/screenshots/05-reports-and-pdf-downloads.jpg)
+### 03. Dashboard — Synthetic Demo Telemetry
 
-### Settings / About — CSV upload and dataset boundaries
-![Settings and About page with CSV upload and dataset boundaries](docs/screenshots/06-settings-about-upload-mode.jpg)
+![Dashboard Synthetic Demo Telemetry](docs/screenshots/03-dashboard-demo-mode.jpg)
+
+### 04. Dashboard — Uploaded Telemetry
+
+![Dashboard Uploaded Telemetry](docs/screenshots/04-dashboard-uploaded-telemetry.jpg)
+
+### 05. Reports — PDF Generation and Downloads
+
+![Reports and PDF Downloads](docs/screenshots/05-reports-and-pdf-downloads.jpg)
+
+### 06. Settings / About — CSV Upload and Dataset Information
+
+![Settings About and CSV Upload](docs/screenshots/06-settings-about-upload-mode.jpg)
+
+### 07. Anomaly Analysis
+
+![Anomaly Analysis](docs/screenshots/07-anomaly-analysis.jpg)
+
+### 08. Sensor Analytics
+
+![Sensor Analytics](docs/screenshots/08-sensor-analytics.jpg)
+
+### 09. Diagnostics and Explainable AI
+
+![Diagnostics and Explainable AI](docs/screenshots/09-diagnostics-explainable-ai.jpg)
+
+### 10. What-If Simulator
+
+![What-If Simulator](docs/screenshots/10-what-if-simulator.jpg)
 
 ---
 
 ## Key Features
 
-- **Vehicle health monitoring:** Displays a health score and supporting indicators from the analysis pipeline.
-- **Sensor anomaly analysis:** Identifies unusual sensor behaviour using the configured anomaly-detection workflow.
-- **Sensor-fault analysis:** Uses cross-sensor and physical-plausibility checks to flag possible sensor faults.
-- **Fault diagnosis:** Runs the trained diagnosis model on supported EngineFaultDB samples.
-- **RUL and prognostics:** Estimates remaining useful life using the trained NASA C-MAPSS FD001 model and clearly identifies the aircraft-engine data context.
+- **Vehicle Health Monitoring:** Displays a vehicle-health score and supporting indicators from the analysis pipeline.
+- **Digital Twin:** Provides a visual representation of vehicle components and their associated sensor conditions.
+- **Sensor Anomaly Analysis:** Identifies unusual sensor behaviour using the configured anomaly-detection workflow.
+- **Sensor-Fault Analysis:** Uses cross-sensor and physical-plausibility checks to flag possible sensor faults.
+- **Fault Diagnosis:** Runs the trained diagnosis model on supported EngineFaultDB samples.
+- **RUL and Prognostics:** Estimates remaining useful life using the trained NASA C-MAPSS FD001 model and clearly identifies the aircraft-engine data context.
 - **Explainable AI:** Presents SHAP-based feature contributions to help interpret diagnosis model outputs.
-- **What-If simulator:** Lets users explore how changing input sensor values affects supported predictions.
-- **Maintenance knowledge:** Retrieves relevant maintenance information from the Automotive Faults dataset.
-- **CSV upload mode:** Validates a user-provided telemetry CSV against the expected schema and runs supported analysis.
-- **PDF reports:** Generates downloadable reports from the current analysis, including relevant health, anomaly, diagnosis, SHAP, RUL, and maintenance information.
-- **History and model analytics:** Provides views for available analysis records and stored model-evaluation metrics.
-- **Dark and light themes:** Includes a responsive interface with persistent theme selection.
+- **What-If Simulator:** Lets users explore how changing input sensor values affects supported predictions.
+- **Maintenance Knowledge:** Retrieves relevant maintenance information from the Automotive Faults dataset.
+- **CSV Upload Mode:** Validates user-provided telemetry against the expected schema and runs supported analysis.
+- **PDF Reports:** Generates downloadable reports from the current analysis, including relevant health, anomaly, diagnosis, SHAP, RUL, and maintenance information.
+- **History and Model Analytics:** Provides views for available analysis records and stored model-evaluation metrics.
+- **Data Quality Monitoring:** Presents telemetry-quality information and validation results.
+- **Dark and Light Themes:** Includes a responsive interface with persistent theme selection.
 
-## Application Pages
+## Application Modules
 
-Dashboard · Vehicle Health · Digital Twin · Diagnostics · Anomaly Analysis · Sensor Analytics · RUL & Prognostics · Explainable AI · What-If Simulator · Maintenance Center · Reports · History · Model Analytics · Data Quality · Settings/About.
+| Category | Modules |
+|---|---|
+| Command Centre | Dashboard, Vehicle Health, Digital Twin |
+| Investigation | Diagnostics, Anomaly Analysis, Sensor Analytics, RUL & Prognostics, Explainable AI |
+| Simulation & Maintenance | What-If Simulator, Maintenance Center, Reports |
+| System & Insights | History, Model Analytics, Data Quality, Settings/About |
+
+---
 
 ## Architecture
 
@@ -83,7 +139,7 @@ Dashboard · Vehicle Health · Digital Twin · Diagnostics · Anomaly Analysis �
                                  │ /api/*
                                  ▼
                   ┌──────────────────────────────┐
-                  │         FastAPI              │
+                  │           FastAPI            │
                   │  API routes and orchestration│
                   └──────────────┬───────────────┘
                                  │
@@ -104,7 +160,9 @@ Dashboard · Vehicle Health · Digital Twin · Diagnostics · Anomaly Analysis �
                   └──────────────────────────────┘
 ```
 
-For the detailed architecture, data flow, and component responsibilities, see [`docs/architecture.md`](docs/architecture.md).
+For detailed architecture, data flow, and component responsibilities, see [`docs/architecture.md`](docs/architecture.md).
+
+---
 
 ## Datasets and Their Roles
 
@@ -120,6 +178,8 @@ Each dataset is used only for the task and scope it supports.
 
 More detail: [`docs/dataset_sources.md`](docs/dataset_sources.md), [`docs/dataset_feature_mapping.md`](docs/dataset_feature_mapping.md), and [`docs/limitations.md`](docs/limitations.md).
 
+---
+
 ## Machine-Learning Methodology and Evaluation
 
 The repository includes trained models and evaluation documentation. The dashboard and model-analytics views present the metrics stored with the models; those evaluation figures describe their corresponding evaluation datasets, not a guarantee about an individual vehicle.
@@ -134,18 +194,29 @@ The repository includes trained models and evaluation documentation. The dashboa
 
 For exact metrics, experimental setup, and limitations, consult [`docs/model_evaluation.md`](docs/model_evaluation.md) and [`docs/methodology.md`](docs/methodology.md).
 
+---
+
 ## Modes of Operation
 
 ### Demo Mode
-The default mode uses generated synthetic telemetry scenarios, including healthy operation, increasing anomaly severity, sensor faults, progressive degradation, and multiple abnormalities. Demo outputs are labelled as synthetic.
+
+The default mode uses generated synthetic telemetry scenarios, including healthy operation, increasing anomaly severity, sensor faults, progressive degradation, and multiple abnormalities.
+
+Demo outputs are labelled as synthetic.
 
 ### Research Mode
-The Diagnostics workflow can draw supported real samples from EngineFaultDB. The RUL workflow uses NASA C-MAPSS engine units and identifies the aircraft turbofan context.
+
+The Diagnostics workflow can draw supported real samples from EngineFaultDB.
+
+The RUL workflow uses NASA C-MAPSS engine units and identifies the aircraft turbofan context.
 
 ### Upload Mode
+
 Users can upload a telemetry CSV. The application validates the expected schema and reports missing or invalid required columns before running the supported pipeline.
 
 The demo telemetry, EngineFaultDB, and NASA C-MAPSS have different feature spaces and roles. They are not merged into one training dataset.
+
+---
 
 ## CSV Upload Schema
 
@@ -164,36 +235,47 @@ battery_voltage_v
 speed_kph
 ```
 
-Use the sample CSV supplied in the repository, where available, as a starting point. Upload only data you are authorized to use, and avoid including personal or sensitive information.
+Use the sample CSV supplied in the repository, where available, as a starting point.
+
+Upload only data you are authorized to use, and avoid including personal or sensitive information.
+
+---
 
 ## Tech Stack
 
-**Frontend**
+### Frontend
+
 - React
 - Vite
 - JavaScript
 - Responsive CSS and theme tokens
 - Charts and interactive dashboard components
+- Lucide React icons
 
-**Backend**
+### Backend
+
 - Python
 - FastAPI
 - Uvicorn
 - SQLite for local application history
 
-**Machine Learning and Explainability**
+### Machine Learning and Explainability
+
 - scikit-learn
 - XGBoost
 - SHAP
 - pandas / NumPy
 
-**Reporting and Deployment**
+### Reporting and Deployment
+
 - ReportLab for PDF generation
 - Vercel for the frontend
 - Render for the backend
 - GitHub for source control
 
 See `frontend/package.json` and `backend/requirements.txt` for the project dependency lists.
+
+---
 
 ## Getting Started Locally
 
@@ -203,14 +285,14 @@ See `frontend/package.json` and `backend/requirements.txt` for the project depen
 - Node.js 18 or later
 - Git
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/HVD02/AI-Auto-Diagnostics-RUL-Engine.git
 cd AI-Auto-Diagnostics-RUL-Engine
 ```
 
-### 2. Start the backend
+### 2. Start the Backend
 
 Create and activate a virtual environment from the repository root.
 
@@ -236,7 +318,7 @@ PYTHONPATH="$(pwd):$(pwd)/backend" python -m uvicorn backend.main:app --reload -
 
 Backend API documentation: http://127.0.0.1:8000/docs
 
-### 3. Start the frontend
+### 3. Start the Frontend
 
 Open a second terminal:
 
@@ -250,7 +332,7 @@ Open the local frontend URL printed by Vite (normally http://localhost:5173).
 
 The Vite development server proxies `/api` requests to the local FastAPI backend. Keep both development servers running while using the application.
 
-### 4. Retraining and data preparation
+### 4. Retraining and Data Preparation
 
 The repository includes scripts for data preparation, demo-data generation, model training, and evaluation. Run them from the repository root when the required datasets and dependencies are available:
 
@@ -265,6 +347,8 @@ python scripts/evaluate_models.py
 
 The trained model files are included under `backend/model/`. Review the individual scripts and dataset documentation before retraining.
 
+---
+
 ## Tests
 
 Install the backend requirements and test dependencies, then run from the repository root:
@@ -275,7 +359,11 @@ python -m pip install pytest httpx
 python -m pytest tests/ -v
 ```
 
-The test suite covers data loading, feature engineering, model workflows, health scoring, sensor-fault detection, maintenance retrieval, and API behaviour. The exact set of tests may evolve; use the current test run as the source of truth.
+The test suite covers data loading, feature engineering, model workflows, health scoring, sensor-fault detection, maintenance retrieval, and API behaviour.
+
+The exact set of tests may evolve; use the current test run as the source of truth.
+
+---
 
 ## Deployment
 
@@ -287,11 +375,13 @@ The current public demo is deployed as:
 
 The Vercel frontend uses the repository's `frontend/vercel.json` rewrite configuration to forward `/api/*` and `/static/*` requests to the Render backend.
 
-### Hosting notes
+### Hosting Notes
 
 - Render free web services can spin down after inactivity, so the first request after a quiet period may be delayed.
 - The default filesystem of a free hosting instance should not be treated as durable storage. SQLite updates, uploaded files, and generated reports may not survive restarts or redeployments unless persistent storage or an external database/object store is configured.
 - For a persistent production deployment, configure durable storage and appropriate backups before relying on long-term history or report retention.
+
+---
 
 ## Limitations and Responsible Use
 
@@ -302,13 +392,18 @@ The Vercel frontend uses the repository's `frontend/vercel.json` rewrite configu
 - Model metrics are dataset-specific evaluation results, not guarantees of real-world vehicle performance.
 - Sensor plausibility checks and model outputs are diagnostic aids, not proof that a physical component has failed.
 
-**Safety disclaimer:** This system is an educational and research demonstration. It does not replace inspection by a qualified automotive technician and must not be used as the sole basis for safety-critical maintenance decisions.
+**Safety Disclaimer:** This system is an educational and research demonstration. It does not replace inspection by a qualified automotive technician and must not be used as the sole basis for safety-critical maintenance decisions.
+
+---
 
 ## Research Gap and Future Scope
 
-The project does not claim to have invented anomaly detection, fault diagnosis, RUL prediction, XGBoost, SHAP, or predictive maintenance. Its contribution is the integration of these workflows into a modular platform with explicit dataset boundaries and transparent reporting.
+The project does not claim to have invented anomaly detection, fault diagnosis, RUL prediction, XGBoost, SHAP, or predictive maintenance.
+
+Its contribution is the integration of these workflows into a modular platform with explicit dataset boundaries and transparent reporting.
 
 Potential future work includes:
+
 - Access to and integration of real fleet-level EngineAD data, subject to permission.
 - Vehicle-specific baselines and validation on automotive RUL datasets.
 - Data-drift monitoring and model recalibration.
@@ -317,6 +412,8 @@ Potential future work includes:
 
 See [`docs/research_gap.md`](docs/research_gap.md) and [`docs/future_scope.md`](docs/future_scope.md).
 
+---
+
 ## References
 
 - Hojjati et al., *EngineAD: A Real-World Vehicle Engine Anomaly Detection Dataset*, arXiv:2603.25955.
@@ -324,9 +421,12 @@ See [`docs/research_gap.md`](docs/research_gap.md) and [`docs/future_scope.md`](
 - [NASA C-MAPSS simulated turbofan engine data](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data).
 - [Automotive Faults Dataset — Zenodo record 15626055](https://zenodo.org/records/15626055).
 
+---
+
 ## Project Documentation
 
 Explore the `docs/` directory for:
+
 - Architecture and pipeline walkthrough
 - Dataset sources and feature mapping
 - Model methodology and evaluation
