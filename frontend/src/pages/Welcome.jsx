@@ -10,7 +10,7 @@ import CarStage from "../components/CarStage.jsx";
 import "./Welcome.css";
 
 // Version label for the footer. Bump together with package.json at the final release.
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "3.0.0";
 const REPO_URL = "https://github.com/HVD02/AI-Auto-Diagnostics-RUL-Engine";
 
 const TAGS = ["Anomaly intelligence", "Explainable diagnosis", "RUL prognostics"];

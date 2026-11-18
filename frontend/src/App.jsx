@@ -28,7 +28,7 @@ import About from "./pages/About.jsx";
 
 // Single place to change the version label shown in the sidebar.
 // (package.json is intentionally NOT touched until the final release phase.)
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "3.0.0";
 const DEFAULT_DOC_TITLE = "AI Auto-Diagnostics & RUL Engine";
 
 // Visual navigation groups. Route paths are unchanged from the existing app.
