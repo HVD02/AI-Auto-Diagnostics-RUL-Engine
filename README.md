@@ -59,44 +59,34 @@ On the free backend tier, the service may spin down after inactivity, so the fir
 ## Screenshots
 
 ### 01. Welcome Page — Dark Theme
-
-![V3 Welcome Page Dark Theme](docs/screenshots/01-welcome-dark.jpg)
+![V3 Welcome Page Dark Theme](docs/screenshots/01-welcome-dark.png)
 
 ### 02. Welcome Page — Light Theme
-
-![V3 Welcome Page Light Theme](docs/screenshots/02-welcome-light.jpg)
+![V3 Welcome Page Light Theme](docs/screenshots/02-welcome-light.png)
 
 ### 03. Dashboard — Synthetic Demo Telemetry
-
-![Dashboard Synthetic Demo Telemetry](docs/screenshots/03-dashboard-demo-mode.jpg)
+![Dashboard Synthetic Demo Telemetry](docs/screenshots/03-dashboard-demo-mode.png)
 
 ### 04. Dashboard — Uploaded Telemetry
-
-![Dashboard Uploaded Telemetry](docs/screenshots/04-dashboard-uploaded-telemetry.jpg)
+![Dashboard Uploaded Telemetry](docs/screenshots/04-dashboard-uploaded-telemetry.png)
 
 ### 05. Reports — PDF Generation and Downloads
-
-![Reports and PDF Downloads](docs/screenshots/05-reports-and-pdf-downloads.jpg)
+![Reports and PDF Downloads](docs/screenshots/05-reports-and-pdf-downloads.png)
 
 ### 06. Settings / About — CSV Upload and Dataset Information
-
-![Settings About and CSV Upload](docs/screenshots/06-settings-about-upload-mode.jpg)
+![Settings About and CSV Upload](docs/screenshots/06-settings-about-upload-mode.png)
 
 ### 07. Anomaly Analysis
-
-![Anomaly Analysis](docs/screenshots/07-anomaly-analysis.jpg)
+![Anomaly Analysis](docs/screenshots/07-anomaly-analysis.png)
 
 ### 08. Sensor Analytics
-
-![Sensor Analytics](docs/screenshots/08-sensor-analytics.jpg)
+![Sensor Analytics](docs/screenshots/08-sensor-analytics.png)
 
 ### 09. Diagnostics and Explainable AI
-
-![Diagnostics and Explainable AI](docs/screenshots/09-diagnostics-explainable-ai.jpg)
+![Diagnostics and Explainable AI](docs/screenshots/09-diagnostics-explainable-ai.png)
 
 ### 10. What-If Simulator
-
-![What-If Simulator](docs/screenshots/10-what-if-simulator.jpg)
+![What-If Simulator](docs/screenshots/10-what-if-simulator.png)
 
 ---
 
