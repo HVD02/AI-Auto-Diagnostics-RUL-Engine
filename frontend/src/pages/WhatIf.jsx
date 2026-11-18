@@ -9,7 +9,7 @@ import "./DiagnosisPages.css";
 
 // Slider constraints: unchanged from the original page.
 const FEATURE_RANGES = {
-  MAP: [10, 250], TPS: [0, 100], Force: [0, 5000], Power: [0, 300],
+  MAP: [0.453, 4.547], TPS: [0, 100], Force: [0, 5000], Power: [0, 300],
   RPM: [500, 6000], "Consumption L/H": [0, 40], "Consumption L/100KM": [0, 25],
   Speed: [0, 220], CO: [0, 5], HC: [0, 1000], CO2: [0, 20], O2: [0, 10],
   Lambda: [0.5, 1.5], AFR: [8, 20],
@@ -34,7 +34,13 @@ const PRESETS = [
 const SEV_RANK = { NONE: 0, MILD: 1, MODERATE: 2, SEVERE: 3 };
 
 const errMsg = (e) => e?.response?.data?.detail || e.message;
+
+// Slider bounds. Every feature keeps its configured range. The original fallback for a feature without a
+// configured range is [0, 2 x baseline]. MAP's configured range (10-250) does not contain the real
+// EngineFaultDB baseline values (e.g. 1.634), so when the MAP baseline falls outside that range the slider
+// uses the same fallback, which always contains the baseline. With a baseline inside 10-250 nothing changes.
 const rangeOf = (k, v) => FEATURE_RANGES[k] || [0, v * 2 || 100];
+
 const num = (v, d = 2) => (Number.isFinite(Number(v)) && v !== null && v !== undefined ? Number(v).toFixed(d) : "—");
 const signed = (n, d = 2) => (n > 0 ? "+" : "") + n.toFixed(d);
 const fmtPct = (p, d = 1) => (typeof p === "number" && Number.isFinite(p) ? `${(p * 100).toFixed(d)}%` : "—");
@@ -61,7 +67,7 @@ function Control({ name, baseVal, value, active, onChange, onReset }) {
           type="range"
           min={lo}
           max={hi}
-          step={(hi - lo) / 200}
+          step={name === "MAP" ? 0.001 : (hi - lo) / 200}
           value={value}
           style={{ "--p": `${pct(value)}%` }}
           onChange={e => onChange(name, parseFloat(e.target.value))}
